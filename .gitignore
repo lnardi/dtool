@@ -1,0 +1,13 @@
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+documentum/cache
+dtoolsdb_old/*
+dtoolsdb/
+lib/*
+derby.log
+dtools.0.log
+build.xml
