@@ -278,7 +278,7 @@ public class LoginPanel extends javax.swing.JPanel {
                 dtoolJFrame.operationControl(dtoolJFrame.OP_LOGIN, true, null);
                 dtoolJFrame.operationControl(dtoolJFrame.OP_LOGIN_CREDENTIALS, true, new String[]{user, docbase});
                 if (loginResult) {
-                   DtoolLogControl.log("Logado com sucesso. Usuário ( " + user + " )", Level.INFO);
+                   DtoolLogControl.log("Logando com usuário ( " + user + " )", Level.INFO);
                    //Registra o novo login na tabela de logins;
                    if (storeLogin) {
                       DtoolLoginControl.storeLogin(docbase, user, password);

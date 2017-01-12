@@ -7,11 +7,18 @@ package br.com.mavalu.dtool.panels;
 
 import br.com.mavalu.dtool.DtoolJFrame;
 import br.com.mavalu.dtool.control.DtoolDqlControl;
+import br.com.mavalu.dtool.control.DtoolLogControl;
+import br.com.mavalu.useful.DocumentumUseful;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import javax.swing.text.Document;
+import java.awt.Rectangle;
+import java.util.logging.Level;
+import javax.swing.text.BadLocationException;
 
 /**
  *
@@ -21,6 +28,8 @@ public class DumpPanel extends javax.swing.JPanel {
 
     private final DtoolJFrame dtoolJFrame;
 
+    private int pos = 0;
+
     /**
      * Creates new form DumpPanel
      *
@@ -29,6 +38,7 @@ public class DumpPanel extends javax.swing.JPanel {
     public DumpPanel(DtoolJFrame dtf) {
         initComponents();
         dtoolJFrame = dtf;
+        jTextArea3.setEditable(false);
     }
 
     /**
@@ -61,6 +71,11 @@ public class DumpPanel extends javax.swing.JPanel {
                 jTextField2ActionPerformed(evt);
             }
         });
+        jTextField2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField2KeyPressed(evt);
+            }
+        });
 
         jLabel5.setText("Id:");
 
@@ -70,6 +85,11 @@ public class DumpPanel extends javax.swing.JPanel {
         jTextArea3.setRows(5);
         jTextArea3.setTabSize(4);
         jTextArea3.setWrapStyleWord(true);
+        jTextArea3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextArea3KeyPressed(evt);
+            }
+        });
         jScrollPane5.setViewportView(jTextArea3);
 
         jButton5.setEnabled(false);
@@ -80,8 +100,8 @@ public class DumpPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton6.setText("Copy All");
         jButton6.setEnabled(false);
-        jButton6.setLabel("Copy");
         jButton6.setName(""); // NOI18N
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -90,6 +110,11 @@ public class DumpPanel extends javax.swing.JPanel {
         });
 
         jTextField1.setToolTipText("Search");
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField1KeyPressed(evt);
+            }
+        });
 
         jButton1.setText("Search");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -139,9 +164,11 @@ public class DumpPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jTextField2ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        String id = jTextField2.getText();
-        jTextArea3.setText(DtoolDqlControl.apiexec(id));
-        jButton6.setEnabled(true);
+        if (DocumentumUseful.validId(jTextField2.getText())) {
+            dump();
+        } else {
+            DtoolLogControl.log("Dump de ID Inválido!!!", Level.SEVERE);
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -150,15 +177,87 @@ public class DumpPanel extends javax.swing.JPanel {
         clipboard.setContents(selection, selection);
     }//GEN-LAST:event_jButton6ActionPerformed
 
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+
+        find();
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void find() {
+        // Get the text to find...convert it to lower case for eaiser comparision
+        String find = jTextField1.getText().toLowerCase();
+
+        if (find.isEmpty()) {
+            jTextField1.requestFocus();
+        }
+        // Focus the text area, otherwise the highlighting won't show up
+        jTextArea3.requestFocusInWindow();
+        // Make sure we have a valid search term
+        if (find != null && find.length() > 0) {
+            Document document = jTextArea3.getDocument();
+            int findLength = find.length();
+            try {
+                boolean found = false;
+                // Rest the search position if we're at the end of the document
+                if (pos + findLength > document.getLength()) {
+                    pos = 0;
+                }
+                // While we haven't reached the end...
+                // "<=" Correction
+                while (pos + findLength <= document.getLength()) {
+                    // Extract the text from teh docuemnt
+                    String match = document.getText(pos, findLength).toLowerCase();
+                    // Check to see if it matches or request
+                    if (match.equals(find)) {
+                        found = true;
+                        break;
+                    }
+                    pos++;
+                }
+
+                // Did we find something...
+                if (found) {
+                    // Get the rectangle of the where the text would be visible...
+                    Rectangle viewRect = jTextArea3.modelToView(pos);
+                    // Scroll to make the rectangle visible
+                    jTextArea3.scrollRectToVisible(viewRect);
+                    // Highlight the text
+                    jTextArea3.setCaretPosition(pos + findLength);
+                    jTextArea3.moveCaretPosition(pos);
+                    // Move the search position beyond the current match
+                    pos += findLength;
+                }
+
+            } catch (BadLocationException exp) {
+                DtoolLogControl.log(exp, Level.SEVERE);
+            }
+        }
+    }
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_F) {
             JOptionPane.showMessageDialog(this, "ctrl + c");
         }         // TODO add your handling code here:
     }//GEN-LAST:event_formKeyPressed
+
+    private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            find();
+        }
+    }//GEN-LAST:event_jTextField1KeyPressed
+
+    private void jTextArea3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea3KeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_F3 ||evt.getKeyCode() == KeyEvent.VK_ENTER ) {
+            find();
+        }
+    }//GEN-LAST:event_jTextArea3KeyPressed
+
+    private void jTextField2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField2KeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            dump();
+        }
+    }//GEN-LAST:event_jTextField2KeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -195,16 +294,46 @@ public class DumpPanel extends javax.swing.JPanel {
                 break;
             case DtoolJFrame.OP_DUMP: //dump
                 if (status) {
-                    dump(list[0]);
+                    dumpEvent(list[0]);
                 }
                 break;
         }
     }
 
-    public void dump(String id) {
+    public void dumpEvent(String id) {
         jTextField2.setText(id);
-        jTextArea3.setText(DtoolDqlControl.apiexec(id));
-        jButton6.setEnabled(true);
-        jTextArea3.setCaretPosition(0);
+        dump();
+
+    }
+
+    public void dump() {
+        DtoolLogControl.log("Dumping:  " + jTextField2.getText(), Level.INFO);
+        jTextArea3.setText("Processando!!!!");
+        jButton6.setEnabled(false);
+        jButton5.setEnabled(false);
+        jButton1.setEnabled(false);
+        jTextField2.requestFocus();
+
+        SwingWorker worker = new SwingWorker<Void, Integer>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                jTextArea3.setText(DtoolDqlControl.apiexec(jTextField2.getText()));
+
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                jButton6.setEnabled(true);
+                jButton5.setEnabled(true);
+                jButton1.setEnabled(true);
+                jTextArea3.setCaretPosition(0);
+                dtoolJFrame.operationControl(dtoolJFrame.OP_DUMP, false, null);//remove a barra de progresso          
+                jTextField1.requestFocus();
+            }
+
+        };
+        worker.execute();
+
     }
 }

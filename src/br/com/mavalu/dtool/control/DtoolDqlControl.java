@@ -29,8 +29,8 @@ public class DtoolDqlControl {
       IDfCollection col = null;
       long startTime = System.currentTimeMillis();
       try {
-
-         col = DocumentumUseful.executarQuery(q, 0, top);
+         //Remove qualquer quebra de linha na query         
+         col = DocumentumUseful.executarQuery(q.replaceAll("\\r|\\n", " "), 0, top);
          if (pg.equals("NO")) {
             pg = "0";
          }
@@ -45,15 +45,14 @@ public class DtoolDqlControl {
 
          for (int i = 0; i < columns; i++) {
             column = jTable1.getColumnModel().getColumn(i);
-            column.setPreferredWidth(size[i] * 9);
+            column.setPreferredWidth(size[i] * 7);
          }
 
          // jLabel8.setText(String.valueOf(queryTM.getRowCount()));
          jTable1.repaint();
-         q = q.replaceAll("[\\n\\t]", " ");
-         if (queryEdited) {
-            DtoolQueryControl.storeQuery(q);
-         }
+
+         //Insere a query na lista de queries
+         DtoolQueryControl.storeQuery(q);
          DtoolLogControl.log("Query excutada com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
          if (queryTM.getRowCount() == 0) {
             DtoolLogControl.log("NEHUM REGISTRO ENCONTRADO <==", Level.INFO);

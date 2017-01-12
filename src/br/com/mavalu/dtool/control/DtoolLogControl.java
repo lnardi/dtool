@@ -45,7 +45,7 @@ public class DtoolLogControl {
                 logComponent.getDocument().insertString(0, dateFormat.format(date) + " ==> " + log + "\n", green);
             } else if (Level.WARNING == l) {
 
-                //  StyleConstants.setForeground(green, Color.orange);
+                  StyleConstants.setForeground(green, Color.YELLOW);
                 logComponent.getDocument().insertString(0, dateFormat.format(date) + " ==> " + log + "\n", green);
 
             } else {

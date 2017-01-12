@@ -65,7 +65,7 @@ public class LoginTableModel extends AbstractTableModel {
             if (col.getAttr(i).isRepeating()) {
                row[i] = col.getAllRepeatingStrings(columns.get(i), "|");
             } else {
-               row[i] = col.getValueAt(i).asString().replace("\n", " ").replace("\r", " ");;
+               row[i] = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
             }
 
             lenght = row[i].length();
@@ -90,7 +90,7 @@ public class LoginTableModel extends AbstractTableModel {
                   value = String.valueOf(col.getValueAt(i).asDouble());
 
                } else {
-                  value = col.getValueAt(i).asString().replace("\n", " ").replace("\r", " ");
+                  value = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
                }
             }
 

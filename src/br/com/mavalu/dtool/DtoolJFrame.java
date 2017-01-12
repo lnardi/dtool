@@ -102,10 +102,11 @@ public class DtoolJFrame extends javax.swing.JFrame {
      */
     public void operationControl(int op, boolean status, String[] list) {
 
+        
+        this.logPanel.operationControl(op, status, list);
         this.dumpPanel.operationControl(op, status, list);
         this.loginPanel.operationControl(op, status, list);
-        this.queryPanel.operationControl(op, status, list);
-        this.logPanel.operationControl(op, status, list);
+        this.queryPanel.operationControl(op, status, list);       
 
         switch (op) {
             case DtoolJFrame.OP_DUMP: 

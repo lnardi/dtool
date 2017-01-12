@@ -86,7 +86,7 @@ public class DtoolQueryControl {
       try {
          String hostName = DocumentumUseful.getHostName();
          
-         query = query.trim().replaceAll("(\\r|\\n)", "");
+         query = query.trim();//.replaceAll("(\\r|\\n)", "");
 
          String insertQuery = "INSERT INTO LUC.\"dql_queries\" (\"query\", \"creation_time\", \"query_hash\") VALUES ('" + query.replace("'", "''") + "','" + currentTimestamp + "', " + query.hashCode()
                  + " ) ";
@@ -100,6 +100,16 @@ public class DtoolQueryControl {
       } catch (SQLException ex) {
          if (!ex.getMessage().contains("QUERY_HASH")) {
             DtoolLogControl.log(ex, Level.SEVERE);
+         } else {
+         String updateQuery = "UPDATE LUC.\"dql_queries\" set \"creation_time\" = \'" + currentTimestamp + "\' WHERE \"query_hash\" = " + query.hashCode();
+         //FAzer um select na tabela de logins utilizando a docbase e o Host            
+             try {
+                 return DbUseful.updateQuery(updateQuery);             
+             } catch (ClassNotFoundException ex1) {
+                 DtoolLogControl.log(ex1, Level.SEVERE);
+             } catch (SQLException ex1) {
+                 DtoolLogControl.log(ex1, Level.SEVERE);
+             }
          }
       } catch (DfException ex) {
          DtoolLogControl.log(ex, Level.SEVERE);
