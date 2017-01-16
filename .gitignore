@@ -9,4 +9,3 @@ dtoolsdb/
 lib/*
 derby.log
 dtools.0.log
-build.xml
