@@ -9,3 +9,5 @@ dtoolsdb/
 lib/*
 derby.log
 dtools.0.log
+documentum/local/
+dtools.*.log*
