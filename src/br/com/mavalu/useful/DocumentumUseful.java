@@ -448,13 +448,11 @@ public class DocumentumUseful {
 
             IDfDocument doc
                     = (IDfDocument) session.getObject(new DfId(r_id));
-            // Create an export node, adding the document to the export operation object.
-            IDfExportNode node = (IDfExportNode) eo.add(doc);
             //VErifica se possui conteúdo.
-            if (doc.getContentSize() == 0){
+            if (doc.getContentSize() == 0) {
                 return "";
-            }       
-            
+            }
+
             IDfId id = null;
             String folderPath = null;
             if (!expAllInFolderOrLikeServer) {
@@ -527,11 +525,20 @@ public class DocumentumUseful {
 
             documentPath += "/" + fileName;
 
-            node.setFilePath(folderPath);
+            File file = new File(folderPath);          
+            
+            //Só exporta se o arquivo não existe.
+            if (!(file.exists() && file.length() == doc.getContentSize())) {
+                // Create an export node, adding the document to the export operation object.
+                IDfExportNode node = (IDfExportNode) eo.add(doc);
 
-            if (!eo.execute()) {
+                node.setFilePath(folderPath);
 
-                throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
+                if (!eo.execute()) {
+
+                    throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
+                }
+
             }
 
             //TODO - remover após embratel
@@ -541,7 +548,7 @@ public class DocumentumUseful {
              * for (int i = 0; i < length; ++i) { anomalia +=
              * doc.getRepeatingString("anomalia", i); if ((i + 1) < length) {
              * anomalia += "|"; } }
-         *
+             *
              */
             /////
         } finally {
@@ -654,7 +661,7 @@ public class DocumentumUseful {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Logger.getLogger(DocumentumUseful.class.getName()).log(Level.SEVERE, null, ex);
-                DtoolLogControl.log("Falha no login: " + ex.getMessage(), Level.SEVERE);                
+                DtoolLogControl.log("Falha no login: " + ex.getMessage(), Level.SEVERE);
             }
 
         }
