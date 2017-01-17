@@ -44,6 +44,7 @@ public class DocumentumUseful {
     private static HashMap<String, String> dosTypeList = new HashMap<String, String>();
     private static HashMap<IDfCollection, IDfSession> sessionList = new HashMap<IDfCollection, IDfSession>();
     private static DfClientX cx;
+    private static IDfLoginInfo li;
 
     /**
      * @param q String com a query
@@ -108,7 +109,6 @@ public class DocumentumUseful {
         }
 
         if (dfClient != null) {
-            IDfLoginInfo li = new DfLoginInfo();
             li.setUser(userName);
             li.setPassword(password);
             // li.setDomain(domain);
@@ -451,10 +451,10 @@ public class DocumentumUseful {
             // Create an export node, adding the document to the export operation object.
             IDfExportNode node = (IDfExportNode) eo.add(doc);
             //VErifica se possui conteúdo.
-            if (doc.getContentSize() == 0){
+            if (doc.getContentSize() == 0) {
                 return "";
-            }       
-            
+            }
+
             IDfId id = null;
             String folderPath = null;
             if (!expAllInFolderOrLikeServer) {
@@ -541,7 +541,7 @@ public class DocumentumUseful {
              * for (int i = 0; i < length; ++i) { anomalia +=
              * doc.getRepeatingString("anomalia", i); if ((i + 1) < length) {
              * anomalia += "|"; } }
-         *
+             *
              */
             /////
         } finally {
@@ -654,11 +654,19 @@ public class DocumentumUseful {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Logger.getLogger(DocumentumUseful.class.getName()).log(Level.SEVERE, null, ex);
-                DtoolLogControl.log("Falha no login: " + ex.getMessage(), Level.SEVERE);                
+                DtoolLogControl.log("Falha no login: " + ex.getMessage(), Level.SEVERE);
             }
 
         }
 
+    }
+
+    public static String getDocbase() {
+        return loginDocbase;
+    }
+
+    public static IDfLoginInfo getIDfLoginInfo() {
+        return li;
     }
 
 }
