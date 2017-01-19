@@ -179,7 +179,7 @@ public class DumpPanel extends javax.swing.JPanel {
 
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        pos = 0;
         find();
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -187,6 +187,8 @@ public class DumpPanel extends javax.swing.JPanel {
     private void find() {
         // Get the text to find...convert it to lower case for eaiser comparision
         String find = jTextField1.getText().toLowerCase();
+        
+        int posEntry = pos;
 
         if (find.isEmpty()) {
             jTextField1.requestFocus();
@@ -227,6 +229,13 @@ public class DumpPanel extends javax.swing.JPanel {
                     jTextArea3.moveCaretPosition(pos);
                     // Move the search position beyond the current match
                     pos += findLength;
+                } else {
+                    //Se pesquiso do início do arquivo até o final e não encontrou nada.
+                    if (posEntry  == 0){
+
+                        //JOptionPane.showMessageDialog(this, "Busca inválida: " + find);
+                        DtoolLogControl.log("Busca inválida: " + find, Level.INFO);
+                    }
                 }
 
             } catch (BadLocationException exp) {
@@ -243,6 +252,7 @@ public class DumpPanel extends javax.swing.JPanel {
 
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            pos = 0;
             find();
         }
     }//GEN-LAST:event_jTextField1KeyPressed
@@ -250,6 +260,10 @@ public class DumpPanel extends javax.swing.JPanel {
     private void jTextArea3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea3KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_F3 ||evt.getKeyCode() == KeyEvent.VK_ENTER ) {
             find();
+        }
+        if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_F) {
+            jTextField1.setText("");
+            jTextField1.requestFocus();
         }
     }//GEN-LAST:event_jTextArea3KeyPressed
 
