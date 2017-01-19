@@ -439,7 +439,7 @@ public class QueryPanel extends javax.swing.JPanel {
                         null,
                         options,
                         null);
-                if (opt > 0 ){
+                if (opt == 1 ){
                     DtoolLogControl.log("A execução da query foi cancelada", Level.WARNING);
                     return;
                 }
