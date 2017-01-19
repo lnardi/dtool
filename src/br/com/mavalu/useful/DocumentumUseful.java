@@ -44,7 +44,7 @@ public class DocumentumUseful {
     private static HashMap<String, String> dosTypeList = new HashMap<String, String>();
     private static HashMap<IDfCollection, IDfSession> sessionList = new HashMap<IDfCollection, IDfSession>();
     private static DfClientX cx;
-    private static IDfLoginInfo li;
+    private static IDfLoginInfo li = new DfLoginInfo();
 
     /**
      * @param q String com a query
