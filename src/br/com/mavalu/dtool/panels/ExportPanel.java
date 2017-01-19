@@ -29,6 +29,10 @@ public class ExportPanel extends javax.swing.JPanel {
    private LoginTableModel loginTableModel;
    private String csvFile;
    private String query;
+   private static String path = null;
+   private static String file_name = null;
+   
+   
 
    /**
     * Creates new form ExportPanel
@@ -44,7 +48,14 @@ public class ExportPanel extends javax.swing.JPanel {
       loginTableModel = ltm;
       query = q;
 
-      jTextField1.setText(new File(".").getCanonicalPath());
+      if (path == null){
+         path = new File(".").getCanonicalPath();
+      }      
+      jTextField1.setText(path);
+      
+      if (file_name != null){
+          jTextField2.setText(file_name);
+      }
 
    }
 
@@ -314,8 +325,12 @@ public class ExportPanel extends javax.swing.JPanel {
 
       if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-         jTextField1.setText(chooser.getSelectedFile().getParent());
-         jTextField2.setText(chooser.getSelectedFile().getName());
+          path = chooser.getSelectedFile().getParent();
+          file_name = chooser.getSelectedFile().getName();
+          
+         jTextField1.setText(path);
+         jTextField2.setText(file_name);
+         
 
       }      
    }//GEN-LAST:event_jButton1ActionPerformed
@@ -345,7 +360,8 @@ public class ExportPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_jButton3ActionPerformed
 
    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-      jDialog.setVisible(false);
+      jDialog.setVisible(false);      
+      file_name = jTextField2.getText();
 
       // jRadioButton5 ==> Reexecutar a query e exportar o resultado;
       // jRadioButton4 ==>Exportar resultado apresentado no grid:
