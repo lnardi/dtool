@@ -362,6 +362,7 @@ public class ExportPanel extends javax.swing.JPanel {
    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
       jDialog.setVisible(false);      
       file_name = jTextField2.getText();
+      path = jTextField1.getText(); 
 
       // jRadioButton5 ==> Reexecutar a query e exportar o resultado;
       // jRadioButton4 ==>Exportar resultado apresentado no grid:
