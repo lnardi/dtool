@@ -291,4 +291,8 @@ public class ExportControl extends Thread {
         csvErrorOutput.newLine();
 
     }
+
+    public int getWaitingProcessing() {
+        return processedLines.size();
+    }
 }

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -32,15 +33,17 @@ public class ExportThreadPanel extends javax.swing.JPanel {
     private SwingWorker workerQuery;
     private ExportControl mc;
     private DtoolJFrame dtoolJFrame;
+    private JDialog jDialog;
 
     /**
      * Creates new form MigrationTool
      */
-    public ExportThreadPanel(ExportControl p_mc, DtoolJFrame p_dtoolJFrame) {
+    public ExportThreadPanel(ExportControl p_mc, DtoolJFrame p_dtoolJFrame, JDialog p_jDialog) {
         initComponents();
         dtoolJFrame = p_dtoolJFrame;
         startTime = System.currentTimeMillis();
         mc = p_mc;
+        jDialog = p_jDialog;
     }
 
     /**
@@ -524,7 +527,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
 
    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
        mc.stopThreads();
-       System.exit(0);
+       jDialog.setVisible(false);
    }//GEN-LAST:event_jButton5ActionPerformed
 
    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
