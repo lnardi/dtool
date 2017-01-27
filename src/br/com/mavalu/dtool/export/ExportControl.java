@@ -40,10 +40,11 @@ public class ExportControl extends Thread {
     private Queue<TrheadDocPack> processedLines = new LinkedList<TrheadDocPack>();
     private BufferedWriter csvOutput = null;
     private BufferedWriter csvErrorOutput = null;
-    private int fileNumber = 1;//Define o número do arquivo csv
+    private int fileNumber = 0;//Define o número do arquivo csv
     private long breakCSV = 0;
     private DtoolJFrame dtoolJFrame = null;
     private String exportPath = null;
+    private String relatieExportPath = null;
 
     public ExportControl(Iterator p_inputsLines, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads) throws IOException, DfException {
 
@@ -66,12 +67,16 @@ public class ExportControl extends Thread {
         dIControlTheadList = new ArrayList<DocumentumExportControl>();
         //Caminho onde os arquivos serão exportados
         if (p_expFolder) {
+            relatieExportPath = exportPath;
             exportPath = (new File(csvFileName)).getParent() + "\\" + exportPath;
         } else {
             exportPath = (new File(csvFileName)).getParent();
         }
         loadThreads();
-
+    }
+    
+    public String getRelativePath() {
+        return relatieExportPath;
     }
 
     public String getPath() {
@@ -146,7 +151,7 @@ public class ExportControl extends Thread {
             tdc.line = String.valueOf(item);//Número da linha
             //Copia os valores da linha para gerar o output
             for (int i = 0; i < row.length; i++) {
-                tdc.line += ";" + row[i].replaceAll("\\r|\\n", " ");
+                tdc.line += ";" + row[i].replaceAll("\\;|\\r|\\n", " ");
             }
 
             processedLines.offer(tdc);
