@@ -30,18 +30,16 @@ public class ExportPanel extends javax.swing.JPanel {
     private LoginTableModel loginTableModel;
     private String csvFile;
     private String query;
-   private static String path = null;
+    private static String path = null;
     private ExportControl ec = null;
-   private static String file_name = null;
-   
-   
+    private static String file_name = null;
 
-   /**
-    * Creates new form ExportPanel
-    */
-   public ExportPanel() {
-      initComponents();
-   }
+    /**
+     * Creates new form ExportPanel
+     */
+    public ExportPanel() {
+        initComponents();
+    }
 
     ExportPanel(JDialog jd, DtoolJFrame dt, LoginTableModel ltm, String q) throws IOException {
         initComponents();
@@ -50,14 +48,14 @@ public class ExportPanel extends javax.swing.JPanel {
         loginTableModel = ltm;
         query = q;
 
-      if (path == null){
-         path = new File(".").getCanonicalPath();
-      }      
-      jTextField1.setText(path);
-      
-      if (file_name != null){
-          jTextField2.setText(file_name);
-      }
+        if (path == null) {
+            path = new File(".").getCanonicalPath();
+        }
+        jTextField1.setText(path);
+
+        if (file_name != null) {
+            jTextField2.setText(file_name);
+        }
 
     }
 
@@ -351,13 +349,12 @@ public class ExportPanel extends javax.swing.JPanel {
 
        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 
-          path = chooser.getSelectedFile().getParent();
-          file_name = chooser.getSelectedFile().getName();
-          
-         jTextField1.setText(path);
-         jTextField2.setText(file_name);
-         
+           path = chooser.getSelectedFile().getParent();
+           file_name = chooser.getSelectedFile().getName();
 
+           jTextField1.setText(path);
+           jTextField2.setText(file_name);
+           jTextField3.setText(jTextField2.getText().substring(0, jTextField2.getText().length() - 4));
        }
    }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -387,9 +384,9 @@ public class ExportPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_jButton3ActionPerformed
 
    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-      jDialog.setVisible(false);      
-      file_name = jTextField2.getText();
-      path = jTextField1.getText(); 
+       jDialog.setVisible(false);
+       file_name = jTextField2.getText();
+       path = jTextField1.getText();
 
        // jRadioButton5 ==> Reexecutar a query e exportar o resultado;
        // jRadioButton4 ==>Exportar resultado apresentado no grid:
@@ -416,7 +413,7 @@ public class ExportPanel extends javax.swing.JPanel {
                    }
 
                    long numberOfThreads = 0;
-                   
+
                    if (jSpinner2.getValue() instanceof Integer) {
 
                        numberOfThreads = ((Integer) jSpinner2.getValue()).longValue();
@@ -480,9 +477,9 @@ public class ExportPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_jRadioButton3StateChanged
 
     private void jCheckBox3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBox3StateChanged
-     
-         jTextField3.setEnabled(jCheckBox3.isSelected());
-     
+
+        jTextField3.setEnabled(jCheckBox3.isSelected());
+
     }//GEN-LAST:event_jCheckBox3StateChanged
 
     private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed

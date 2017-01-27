@@ -65,7 +65,7 @@ public class DocumentumExportControl extends Thread {
                     if (tdc != null && tdc.line != null) {
                         try {
                             //importa o conteúdo para docbase
-                            String path = documentumUseful.exportDocument(mc.getPath(), tdc.id, tdc.item, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
+                            String path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc.id, tdc.item, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
                             tdc.line += ";" + path;
                             fileProcessedNumber++;
                         } catch (DfException ex) {

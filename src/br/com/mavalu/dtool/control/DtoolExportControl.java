@@ -132,7 +132,7 @@ public class DtoolExportControl {
             line = String.valueOf(item);//Número da linha
             //Copia os valores da linha para gerar o output
             for (int i = 0; i < row.length; i++) {
-                line += ";" + row[i].replaceAll("\\r|\\n", " ");
+                line += ";" + row[i].replaceAll("\\;|\\r|\\n", " ");
             }
 
             String path = "";

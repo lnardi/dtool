@@ -378,7 +378,7 @@ public class DocumentumUsefulThreadSafe {
 
     }
 
-    public String exportDocument(String path, String r_id, long item, int dctmFolderExtruture, boolean expAllInFolderOrLikeServer) throws DfException {
+    public String exportDocument(String path, String relativePath, String r_id, long item, int dctmFolderExtruture, boolean expAllInFolderOrLikeServer) throws DfException {
 
         //TODO - Remover após embratel
         //String anomalia = "";
@@ -468,6 +468,10 @@ public class DocumentumUsefulThreadSafe {
             folderPath += "/" + fileName;
 
             documentPath += "/" + fileName;
+            if (relativePath != null){
+                documentPath = "/" + relativePath + documentPath ;
+            }
+            
 
             node.setFilePath(folderPath);
 
@@ -480,7 +484,7 @@ public class DocumentumUsefulThreadSafe {
             sessionMgr.release(session);
         }
 
-        //return anomalia + ";" + documentPath;
+        
         return documentPath;
     }
 

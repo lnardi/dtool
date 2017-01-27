@@ -6,8 +6,11 @@
 package br.com.mavalu.dtool.panels;
 
 import br.com.mavalu.dtool.DtoolJFrame;
+import br.com.mavalu.dtool.control.DtoolDqlControl;
+import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.dtool.export.DocumentumExportControl;
 import br.com.mavalu.dtool.export.ExportControl;
+import br.com.mavalu.useful.LoginTableModel;
 import br.com.mavalu.useful.ThreadTableModel;
 import com.documentum.fc.common.DfException;
 import java.awt.event.ActionEvent;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -675,13 +679,42 @@ public class ExportThreadPanel extends javax.swing.JPanel {
             jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
             if (threadsStoped) {
                 jButton4.setEnabled(false);//Desabilita o botão de Begin
-                jButton5.setText("SAIR");//Desabilita o botão de Begin                
+                jButton5.setText("SAIR");//Desabilita o botão de Begin 
+                verificarSair();
             }
 
         }
 
     };
 
+    private void verificarSair() {
+        SwingWorker workerQuery = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                statisticsTimer.stop();
+                Object[] options = {"SAIR",
+                    "PERMANECER"};
+
+                int opt = JOptionPane.showOptionDialog(jDialog,
+                        "Exportaçao finalizada",
+                        "Exportação",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,
+                        options,
+                        null);
+                if (opt == 0) {
+                    DtoolLogControl.log("Exmportação Finalizada", Level.INFO);
+                    jDialog.setVisible(false);
+                }
+
+                return null;
+            }
+        };
+
+        workerQuery.execute();
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
