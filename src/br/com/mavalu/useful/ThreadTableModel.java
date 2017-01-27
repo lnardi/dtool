@@ -33,7 +33,7 @@ public class ThreadTableModel extends AbstractTableModel {
       columns = new <String> ArrayList();
       columns.add("Nome");
       columns.add("Status");
-      columns.add("Importados");
+      columns.add("Exportados");
       columns.add("Imp/Min");
       columns.add("Imp/Hora");
 

@@ -34,6 +34,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
     private ExportControl mc;
     private DtoolJFrame dtoolJFrame;
     private JDialog jDialog;
+    private Timer statisticsTimer;
 
     /**
      * Creates new form MigrationTool
@@ -41,9 +42,12 @@ public class ExportThreadPanel extends javax.swing.JPanel {
     public ExportThreadPanel(ExportControl p_mc, DtoolJFrame p_dtoolJFrame, JDialog p_jDialog) {
         initComponents();
         dtoolJFrame = p_dtoolJFrame;
-        startTime = System.currentTimeMillis();
         mc = p_mc;
         jDialog = p_jDialog;
+
+        jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
+        jTextField3.setText(Integer.toString(mc.getNumberOfThreads()));
+
     }
 
     /**
@@ -223,7 +227,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(56, 56, 56))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Threads Exportando"));
@@ -262,27 +266,27 @@ public class ExportThreadPanel extends javax.swing.JPanel {
         jLabel8.setForeground(new java.awt.Color(255, 0, 0));
         jLabel8.setText("00:00:00");
 
-        jLabel1.setText("Total Importados: ");
+        jLabel1.setText("Total Exportados: ");
 
         jLabel2.setBackground(new java.awt.Color(255, 255, 255));
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel2.setText("0");
 
-        jLabel5.setText("Import/Ultima Hora");
+        jLabel5.setText("Exportados/Ultima Hora");
 
         jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel4.setText("0");
 
-        jLabel7.setText("Import/Último Min");
+        jLabel7.setText("Exportados/Último Min");
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel6.setText("0");
 
-        jLabel16.setText("Média Import/Min");
+        jLabel16.setText("Média Exportados/Min");
 
-        jLabel17.setText("Média Import/Hora");
+        jLabel17.setText("Média Exportados/Hora");
 
         jLabel18.setBackground(new java.awt.Color(255, 255, 255));
         jLabel18.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -347,7 +351,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -369,7 +373,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addContainerGap())
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -381,7 +385,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
             }
         });
 
-        jButton5.setText("FINALIZAR");
+        jButton5.setText("CANCELAR");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -395,7 +399,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(90, 90, 90)
                 .addComponent(jButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 453, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 463, Short.MAX_VALUE)
                 .addComponent(jButton5)
                 .addGap(93, 93, 93))
         );
@@ -472,26 +476,27 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                //Inicia o processo de carga      
                if (jButton4.getText().equals("INICIAR")) {
 
-                   if (mc == null) {
+                   startTime = System.currentTimeMillis();
 
-                       mc.startExportThreads();
+                   mc.startExportThreads();
 
-                       ThreadTableModel queryTM = new ThreadTableModel(mc.getDIControlTheadList(), 1000);
+                   ThreadTableModel queryTM = new ThreadTableModel(mc.getDIControlTheadList(), 1000);
 
-                       jTable1.setModel(queryTM);
+                   jTable1.setModel(queryTM);
 
-                       jTable1.repaint();
+                   jTable1.repaint();
 
-                       //jTextField2.setText(Integer.toString(mc.getSizeCache()));
-                       jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
-                       jTextField3.setText(Integer.toString(mc.getNumberOfThreads()));
-                       jButton1.setEnabled(true);
+                   //jTextField2.setText(Integer.toString(mc.getSizeCache()));
+                   jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
+                   jTextField3.setText(Integer.toString(mc.getNumberOfThreads()));
+                   jButton1.setEnabled(true);
 
-                       Timer t = new Timer(1000, updateClockAction);
-                       t.start();
+                   statisticsTimer = new Timer(1000, updateClockAction);
+                   statisticsTimer.start();
 
-                       jButton4.setText("PAUSAR");
-                   }
+                   jButton5.setText("FINALIZAR");
+                   jButton4.setText("PAUSAR");
+
                } else if (jButton4.getText().equals("PAUSAR")) {
                    mc.pauseThreads();
                    jButton4.setText("REINICIAR");
@@ -526,8 +531,20 @@ public class ExportThreadPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_jTextField1ActionPerformed
 
    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-       mc.stopThreads();
-       jDialog.setVisible(false);
+
+       if (jButton5.getText() != "FINALIZAR") {
+           statisticsTimer.stop();
+           jDialog.setVisible(false);
+
+       } else {
+           jButton5.setText("FINALIZANDO THREADS!!!!!");
+           jButton4.setEnabled(false);
+           jButton5.setEnabled(false);
+           mc.stopThreads();
+           jButton5.setEnabled(true);
+           jButton5.setText("FECHAR");
+       }
+
    }//GEN-LAST:event_jButton5ActionPerformed
 
    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -604,12 +621,16 @@ public class ExportThreadPanel extends javax.swing.JPanel {
 
             if (!pause) {
                 jLabel8.setText(time);
+
+                updateCounters((millis / (1000 * 60)), hour);
             }
 
-            updateCounters((millis / (1000 * 60)), hour);
         }
 
         private void updateCounters(long minute, long hour) {
+
+            boolean threadsStoped = true;//Utilizada para verificar se todas as trheads já finalizaram
+
             mc.updateStatistics();
 
             ThreadTableModel queryTM = (ThreadTableModel) jTable1.getModel();
@@ -635,6 +656,7 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 queryTM.setValueAt(String.valueOf(item.getFileProcessedNumber()), i, 2);
                 queryTM.setValueAt(String.valueOf(item.getTotalMinute()), i, 3);
                 queryTM.setValueAt(String.valueOf(item.getTotalHour()), i, 4);
+                threadsStoped = threadsStoped && !item.isActive();
                 i++;
             }
             jTable1.repaint();
@@ -650,6 +672,12 @@ public class ExportThreadPanel extends javax.swing.JPanel {
             if (hour > 0) {
                 jLabel19.setText(String.valueOf(total / hour));
             }
+            jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
+            if (threadsStoped) {
+                jButton4.setEnabled(false);//Desabilita o botão de Begin
+                jButton5.setText("SAIR");//Desabilita o botão de Begin                
+            }
+
         }
 
     };

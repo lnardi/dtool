@@ -110,8 +110,6 @@ public class DtoolExportControl {
             }
         }
 
-        //TODO - Após embratel remover o item anomalia
-        //line += ";anomalia;file_path";
         if (exportContent) {
             if (!columnNameFound || columnR_idFound < 0) {
                 throw new Exception("Para exportação do conteúdo, a query deve retornar os campos Object_name e r_object_id");
@@ -225,7 +223,7 @@ public class DtoolExportControl {
      * especifica qual das possíveis extruturas deve ser exportada. Caso a
      * estrutura excolhida não exista, exportara a extrutura
      */
-    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         if (exportContent) {
             DtoolLogControl.log("Iniciando processo de Exportação (COM CONTEÚDO)", Level.INFO);
@@ -266,7 +264,7 @@ public class DtoolExportControl {
 
         // Chamdo o 
         //public ExportControl(Iterator p_inputsLines, String p_path, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID) throws IOException, DfException {
-        return new ExportControl(rows, csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder);
+        return new ExportControl(rows, csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder, p_exportPath, p_numberOfThreads);
 
     }
 

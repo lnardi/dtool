@@ -44,6 +44,7 @@ public class QueryPanel extends javax.swing.JPanel {
         dtoolJFrame = dtf;
         //LImpa a lista
         jTable1.setModel(new DefaultTableModel());
+        
     }
 
     /**
@@ -55,8 +56,8 @@ public class QueryPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jDialog1 = new javax.swing.JDialog();
-        jDialog2 = new javax.swing.JDialog();
+        jDialog1 = new javax.swing.JDialog(dtoolJFrame);
+        jDialog2 = new javax.swing.JDialog(dtoolJFrame);
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel6 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -84,7 +85,6 @@ public class QueryPanel extends javax.swing.JPanel {
         jTable1 = new javax.swing.JTable();
 
         jDialog1.setTitle("Queries");
-        jDialog1.setAlwaysOnTop(true);
         jDialog1.setModal(true);
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
@@ -98,8 +98,8 @@ public class QueryPanel extends javax.swing.JPanel {
             .addGap(0, 300, Short.MAX_VALUE)
         );
 
+        jDialog2.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         jDialog2.setTitle("Exportação");
-        jDialog2.setAlwaysOnTop(true);
         jDialog2.setModal(true);
         jDialog2.setResizable(false);
 
@@ -505,7 +505,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jDialog1.setLocationRelativeTo(null);
         jDialog1.setLocationByPlatform(true);
         jDialog1.setContentPane(queryList);
-        jDialog1.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        //jDialog1.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ImageIcon img = new ImageIcon("./img/img (1).png");
         jDialog1.setIconImage(img.getImage());
         jDialog1.pack();
@@ -887,7 +887,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jDialog2.setLocationByPlatform(true);
 
         jDialog2.setContentPane(exportPanel);
-        jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        //jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ImageIcon img = new ImageIcon("./img/img (1).png");
         jDialog2.setIconImage(img.getImage());
         jDialog2.pack();

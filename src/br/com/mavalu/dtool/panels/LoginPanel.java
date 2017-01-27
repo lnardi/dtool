@@ -223,7 +223,7 @@ public class LoginPanel extends javax.swing.JPanel {
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
 
        if (workerDocbases != null && !workerDocbases.isDone()) {
-          DtoolLogControl.log("Processo já em execução", Level.WARNING);
+          //DtoolLogControl.log("Processo já em execução", Level.WARNING);
           return;
        }
 

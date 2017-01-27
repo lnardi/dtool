@@ -50,10 +50,10 @@ public class ExportPanel extends javax.swing.JPanel {
 
     }
 
-    public ExportControl getExportControl(){
+    public ExportControl getExportControl() {
         return ec;
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -81,6 +81,7 @@ public class ExportPanel extends javax.swing.JPanel {
         jSpinner1 = new javax.swing.JSpinner();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox3 = new javax.swing.JCheckBox();
+        jTextField3 = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jSpinner2 = new javax.swing.JSpinner();
@@ -119,6 +120,11 @@ public class ExportPanel extends javax.swing.JPanel {
 
         jTextField2.setText("dtool_export.csv");
         jTextField2.setAutoscrolls(false);
+        jTextField2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextField2FocusLost(evt);
+            }
+        });
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField2ActionPerformed(evt);
@@ -166,7 +172,7 @@ public class ExportPanel extends javax.swing.JPanel {
             }
         });
 
-        jCheckBox3.setText("Colocar contúdos em subfolder \\Exp");
+        jCheckBox3.setText("Exportar em subfolder :");
         jCheckBox3.setEnabled(false);
         jCheckBox3.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -179,12 +185,22 @@ public class ExportPanel extends javax.swing.JPanel {
             }
         });
 
+        jTextField3.setText("dtool_export");
+        jTextField3.setEnabled(false);
+        jTextField3.setFocusable(false);
+        jTextField3.setRequestFocusEnabled(false);
+        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(21, 21, 21)
                         .addComponent(jLabel3)
@@ -197,7 +213,10 @@ public class ExportPanel extends javax.swing.JPanel {
                         .addComponent(jCheckBox2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jCheckBox3))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jCheckBox3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField3)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -217,7 +236,9 @@ public class ExportPanel extends javax.swing.JPanel {
                     .addComponent(jLabel3)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox3)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBox3)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(86, 86, 86))
         );
 
@@ -225,7 +246,8 @@ public class ExportPanel extends javax.swing.JPanel {
 
         jLabel4.setText("Número de Threads: ");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(1, 1, 50, 1));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(2, 1, 20, 1));
+        jSpinner2.setEditor(new javax.swing.JSpinner.NumberEditor(jSpinner2, ""));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -273,7 +295,7 @@ public class ExportPanel extends javax.swing.JPanel {
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 10, Short.MAX_VALUE))
+                        .addGap(0, 23, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
@@ -376,20 +398,28 @@ public class ExportPanel extends javax.swing.JPanel {
                        value = (Long) jSpinner1.getValue();
                    }
 
-                   if (jCheckBox1.isSelected()) {                       
+                   long numberOfThreads = 0;
+                   
+                   if (jSpinner2.getValue() instanceof Integer) {
+
+                       numberOfThreads = ((Integer) jSpinner2.getValue()).longValue();
+                   } else {
+                       numberOfThreads = (Long) jSpinner2.getValue();
+                   }
+
+                   if (jCheckBox1.isSelected()) {
                        long startTime = System.currentTimeMillis();
-                       
+
                        ec = DtoolExportControl.exportQueryGridThreads(csvFile,
-                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? value : 0), jCheckBox3.isSelected());
-                       
+                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? value : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads);
+
                        ExportThreadPanel etp = new ExportThreadPanel(ec, dtoolJFrame, jDialog);
                        jDialog.setContentPane(etp);
                        jDialog.pack();
                        jDialog.setVisible(true);
-                       
-                       
-                       DtoolLogControl.log("Processo de Exportação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);                       
-                       
+
+                       DtoolLogControl.log("Processo de Exportação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
+
                    } else {
 
                        DtoolExportControl.exportQueryGrid(csvFile,
@@ -433,12 +463,22 @@ public class ExportPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_jRadioButton3StateChanged
 
     private void jCheckBox3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBox3StateChanged
-        // TODO add your handling code here:
+     
+         jTextField3.setEnabled(jCheckBox3.isSelected());
+     
     }//GEN-LAST:event_jCheckBox3StateChanged
 
     private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBox3ActionPerformed
+
+    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField3ActionPerformed
+
+    private void jTextField2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField2FocusLost
+        jTextField3.setText(jTextField2.getText().substring(0, jTextField2.getText().length() - 4));
+    }//GEN-LAST:event_jTextField2FocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -463,5 +503,6 @@ public class ExportPanel extends javax.swing.JPanel {
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
 }

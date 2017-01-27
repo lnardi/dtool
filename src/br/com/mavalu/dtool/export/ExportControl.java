@@ -45,7 +45,7 @@ public class ExportControl extends Thread {
     private DtoolJFrame dtoolJFrame = null;
     private String exportPath = null;
 
-    public ExportControl(Iterator p_inputsLines, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder) throws IOException, DfException {
+    public ExportControl(Iterator p_inputsLines, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads) throws IOException, DfException {
 
         inputsLines = p_inputsLines;
         dctmFolderExtruture = p_dctmFolderExtruture;
@@ -55,13 +55,20 @@ public class ExportControl extends Thread {
         columnID = p_columnID;
         breakCSV = p_breakCSV;
         dtoolJFrame = p_dtoolJFrame;
+        exportPath = p_exportPath;
+        if (p_numberOfThreads >= 1) {
+            numberOfThreads = (int) p_numberOfThreads;
+        } else {
+            numberOfThreads = 2;
+        }
 
-        numberOfThreads = 1;
         numberOfTryGetNextLine = 4;
         dIControlTheadList = new ArrayList<DocumentumExportControl>();
-        exportPath = (new File(csvFileName)).getParent();//Caminho onde os arquivos serão exportados
+        //Caminho onde os arquivos serão exportados
         if (p_expFolder) {
-            exportPath = exportPath + "\\FILES";
+            exportPath = (new File(csvFileName)).getParent() + "\\" + exportPath;
+        } else {
+            exportPath = (new File(csvFileName)).getParent();
         }
         loadThreads();
 
@@ -97,6 +104,7 @@ public class ExportControl extends Thread {
         for (DocumentumExportControl i : dIControlTheadList) {
             i.start();
         }
+        this.start();
     }
 
     public int getTryGetNextLine() {
@@ -124,8 +132,7 @@ public class ExportControl extends Thread {
     }
 
     public int getNumberOfThreads() {
-        return dIControlTheadList.size();
-
+        return dIControlTheadList.size() == 0 ? numberOfThreads : dIControlTheadList.size();
     }
 
     public synchronized TrheadDocPack getNextLine() {
@@ -152,14 +159,14 @@ public class ExportControl extends Thread {
         for (DocumentumExportControl i : dIControlTheadList) {
             i.setStop();
         }
-        //Aguarda todas as threads finalizarem;
-        boolean isActive = true;
-
         //inativa a thread de entrada
         active = false;
 
+        //Aguarda todas as threads finalizarem;
+        boolean isActive = true;
+
         //Garante que todas as importação sendo processadas finalizaram e todas as threads inativaram.
-        while (isActive) {
+        while (isActive || processedLines.size() > 0) {
             isActive = false;
 
             for (DocumentumExportControl i : dIControlTheadList) {
@@ -173,6 +180,7 @@ public class ExportControl extends Thread {
         DocumentumExportControl dIC = new DocumentumExportControl(this, DocumentumUseful.getDocbase(), DocumentumUseful.getIDfLoginInfo());
         dIControlTheadList.add(dIC);
         dIC.start();
+        numberOfThreads++;
         return dIC;
 
     }
@@ -181,22 +189,21 @@ public class ExportControl extends Thread {
         for (DocumentumExportControl i : dIControlTheadList) {
             i.setPause(true);
         }
-        active = false;
+
     }
 
     public void resumeThreads() {
         for (DocumentumExportControl i : dIControlTheadList) {
             i.setPause(false);
         }
-        active = true;
+
     }
 
     @Override
     public void run() {
         try {
-            while (isActive()) {
-                while (processedLines.peek().processed) {
-
+            while (isActive() || processedLines.size() > 0) {
+                while (processedLines.peek() != null && processedLines.peek().processed) {
                     TrheadDocPack tdp = processedLines.poll();
                     if (tdp.processed) {
                         if (tdp.success) {
@@ -208,9 +215,22 @@ public class ExportControl extends Thread {
 
                     dtoolJFrame.operationControl(dtoolJFrame.OP_EXPORT_COUNT, false, new String[]{"" + item + " - Erros: " + erros
                     });
-
                 }
-                sleep(100);
+
+                //Se estiver em pausa, não possuir mais arquivos aguardando processamento
+                if (processedLines.size() > 0) {
+                    sleep(100);
+                } else {
+                    //Escreve as linhas em memório
+                    if (csvErrorOutput != null) {
+                        csvErrorOutput.flush();
+                    }
+                    if (csvOutput != null) {
+                        csvOutput.flush();
+                    }
+
+                    sleep(1000);
+                }
             }
             //Finaliza os arquivos
             if (csvErrorOutput != null) {
@@ -221,7 +241,7 @@ public class ExportControl extends Thread {
             csvOutput.close();
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            // TODO - Como tratar este erro, mas deve paralizar tudo.
             e.printStackTrace();
         }
     }
