@@ -30,14 +30,14 @@ public class QueryTableModel extends AbstractTableModel {
     public QueryTableModel(ResultSet col, int pg) throws SQLException {
 
         columns = new <String> ArrayList();
-        columns.add("ID");
+        columns.add("Docbase");
         columns.add("Query");
         columns.add("Data");
 
         rows = new <String[]> ArrayList();
         columnSize = new int[3];
-        columnSize[0] = 10;
-        columnSize[1] = 450;
+        columnSize[0] = 20;
+        columnSize[1] = 440;
         columnSize[2] = 30;
 
         String row[] = null;
@@ -49,9 +49,9 @@ public class QueryTableModel extends AbstractTableModel {
         while (col.next()) {
             row = new String[3];
 
-            row[0] = col.getString(1);
+            row[0] = col.getString(3);
             row[1] = col.getString(2);
-            row[2] = col.getString(3);
+            row[2] = col.getString(4);
 
             rows.add(row);
 
