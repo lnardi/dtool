@@ -1,5 +1,6 @@
 package br.com.mavalu.useful;
 
+import br.com.mavalu.dtool.export.TrheadDocPack;
 import static br.com.mavalu.useful.DocumentumUseful.getRepsitoryDosFormatFromMimeType;
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
@@ -20,7 +21,12 @@ import com.documentum.fc.common.IDfId;
 import com.documentum.fc.common.IDfLoginInfo;
 import com.documentum.operations.IDfExportNode;
 import com.documentum.operations.IDfExportOperation;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +34,6 @@ import java.util.List;
 
 public class DocumentumUsefulThreadSafe {
 
-    
     private IDfClientX cx = new DfClientX();
     private IDfClient dfClient = null;
     private IDfSessionManager sessionMgr = null;
@@ -84,7 +89,7 @@ public class DocumentumUsefulThreadSafe {
     }
 
     public void login(String docbase, String userName, String password) throws DfException {
-    
+
         if (docbase == null || userName == null || docbase.isEmpty() || userName.isEmpty()) {
             throw new DfException("Docbase, username ou Senha n�o foram inseridos");
         }
@@ -106,10 +111,10 @@ public class DocumentumUsefulThreadSafe {
         }
 
     }
-    
-     public void login(String docbase, IDfLoginInfo li) throws DfException {
-    
-        if (docbase == null || li == null || docbase.isEmpty() ) {
+
+    public void login(String docbase, IDfLoginInfo li) throws DfException {
+
+        if (docbase == null || li == null || docbase.isEmpty()) {
             throw new DfException("Docbase, username ou Senha n�o foram inseridos");
         }
 
@@ -120,7 +125,6 @@ public class DocumentumUsefulThreadSafe {
         }
 
         if (dfClient != null) {
-            
 
             sessionMgr = dfClient.newSessionManager();
             sessionMgr.setIdentity(loginDocbase, li);
@@ -378,7 +382,13 @@ public class DocumentumUsefulThreadSafe {
 
     }
 
-    public String exportDocument(String path, String relativePath, String r_id, long item, int dctmFolderExtruture, boolean expAllInFolderOrLikeServer) throws DfException {
+    //Faz o primeiro Login
+    public void loadSession() throws DfException {
+        IDfSession session = sessionMgr.getSession(loginDocbase);
+        release(session);
+    }
+
+    public String exportDocument(String path, String relativePath, TrheadDocPack tdc, int dctmFolderExtruture, boolean expAllInFolderOrLikeServer) throws DfException {
 
         //TODO - Remover após embratel
         //String anomalia = "";
@@ -391,9 +401,7 @@ public class DocumentumUsefulThreadSafe {
 
         try {
             IDfDocument doc
-                    = (IDfDocument) session.getObject(new DfId(r_id));
-            // Create an export node, adding the document to the export operation object.
-            IDfExportNode node = (IDfExportNode) eo.add(doc);
+                    = (IDfDocument) session.getObject(new DfId(tdc.id));
             //VErifica se possui conteúdo.
             if (doc.getContentSize() == 0) {
                 return "";
@@ -451,7 +459,7 @@ public class DocumentumUsefulThreadSafe {
                 }
             }
 
-            String fileName = item + "_" + name;
+            String fileName = tdc.item + "_" + name;
 
             //Garante que o path mais o nome do arquivo não excedam 256 caracteres
             if ((folderPath.length() + fileName.length()) > 256) {
@@ -459,7 +467,7 @@ public class DocumentumUsefulThreadSafe {
                 String contentType = doc.getString("a_content_type");
                 String dosExtention = getRepsitoryDosFormatFromMimeType(contentType);
 
-                fileName = item + "." + dosExtention;
+                fileName = tdc.item + "." + dosExtention;
 
                 if ((folderPath.length() + fileName.length()) > 256) {
                     throw new DfException("Error - Nome do arquivo mais o path escolhido excederam o tamanho máximo suportado pelo sistema(256).");
@@ -468,23 +476,48 @@ public class DocumentumUsefulThreadSafe {
             folderPath += "/" + fileName;
 
             documentPath += "/" + fileName;
-            if (relativePath != null){
-                documentPath = "/" + relativePath + documentPath ;
-            }
-            
-
-            node.setFilePath(folderPath);
-
-            if (!eo.execute()) {
-
-                throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
+            if (relativePath != null) {
+                documentPath = "/" + relativePath + documentPath;
             }
 
+            File file = new File(folderPath);
+
+            //Só exporta se o arquivo não existe.
+            if (!(file.exists() && file.length() == doc.getContentSize())) {
+                //Pega o tamanho
+                //TODO - Descomentar
+                /**
+                tdc.size = doc.getContentSize();
+                // Create an export node, adding the document to the export operation object.
+                IDfExportNode node = (IDfExportNode) eo.add(doc);
+
+                node.setFilePath(folderPath);
+
+                if (!eo.execute()) {
+
+                    throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
+                }
+                **/
+                ////TODO - REMOVER, É SÓ PARA TESTES
+                Writer writer = null;
+                try {
+                    writer = new BufferedWriter(new OutputStreamWriter(
+                            new FileOutputStream(folderPath), "utf-8"));
+                    writer.write("Something");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        writer.close();
+                    } catch (Exception ex) {/*ignore*/
+                    }
+                }
+
+            }
         } finally {
             sessionMgr.release(session);
         }
 
-        
         return documentPath;
     }
 

@@ -34,16 +34,20 @@ public class ThreadTableModel extends AbstractTableModel {
       columns.add("Nome");
       columns.add("Status");
       columns.add("Exportados");
-      columns.add("Imp/Min");
-      columns.add("Imp/Hora");
+      columns.add("Files/m");
+      columns.add("Files/h");
+      columns.add("Size/m");
+      columns.add("Size/h");
 
       rows = new <String[]> ArrayList();
-      columnSize = new int[5];
-      columnSize[0] = 50;
-      columnSize[1] = 40;
-      columnSize[2] = 30;
-      columnSize[3] = 30;
-      columnSize[4] = 30;
+      columnSize = new int[7];
+      columnSize[0] = 15;
+      columnSize[1] = 50;
+      columnSize[2] = 10;
+      columnSize[3] = 10;
+      columnSize[4] = 10;
+      columnSize[5] = 20;
+      columnSize[6] = 20;
 
       DocumentumExportControl pb = null;
 
@@ -53,7 +57,7 @@ public class ThreadTableModel extends AbstractTableModel {
       Iterator it = col.iterator();
 
       while (it.hasNext()) {
-         row = new String[5];
+         row = new String[7];
          pb = (DocumentumExportControl) it.next();
 
          row[0] = pb.getName();
@@ -61,6 +65,8 @@ public class ThreadTableModel extends AbstractTableModel {
          row[2] = String.valueOf(pb.getFileProcessedNumber());
          row[3] = "0";
          row[4] = "0";
+         row[5] = "0";
+         row[6] = "0";
 
          rows.add(row);
 

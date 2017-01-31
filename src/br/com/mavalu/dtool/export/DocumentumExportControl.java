@@ -1,5 +1,6 @@
 package br.com.mavalu.dtool.export;
 
+import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.useful.DocumentumUsefulThreadSafe;
 import java.io.File;
 import java.io.IOException;
@@ -32,14 +33,23 @@ public class DocumentumExportControl extends Thread {
     private boolean pause = false;
     private boolean pauseRealTime = false;
     private long fileProcessedNumber = 0;
+    private long lastFileProcessedNumber = 0;
     private long[] totalHourArray = new long[60];
+    private long[] totalSizeHourArray = new long[60];
+    private long[] totalMinArray = new long[60];
+    private long[] totalSizeMinArray = new long[60];
+
     private int second = 0;
     private int minute = 0;
-    private long[] totalMinArray = new long[60];
     private long totalHour = 0;
     private long totalMin = 0;
-    private long lastFileProcessedNumber = 0;
+    private long totalSizeHour = 0;
+    private long totalSizeMin = 0;
+
     private TrheadDocPack tdc = null;
+    private String status = "Inativa";
+    private long fileProcessedSize = 0;
+    private long lastFileProcessedSize = 0;
 
     public DocumentumExportControl(ExportControl migrationControl, String docbase, IDfLoginInfo li) throws IOException, DfException {
 
@@ -55,22 +65,25 @@ public class DocumentumExportControl extends Thread {
         String id = null;
         isActive = true;
         isActiveRealTime = true;
-
         try {
+            status = "Login Documentum";
+            documentumUseful.loadSession();
 
             while (isActive) {
 
                 if (!pause) {
+                    status = "Processando";
                     tdc = getNextLine();
                     if (tdc != null && tdc.line != null) {
                         try {
                             //importa o conteúdo para docbase
-                            String path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc.id, tdc.item, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
+                            String path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
                             tdc.line += ";" + path;
                             fileProcessedNumber++;
+                            fileProcessedSize += tdc.size;
                         } catch (DfException ex) {
                             tdc.success = false;
-                            Logger.getLogger(DocumentumExportControl.class.getName()).log(Level.SEVERE, null, ex);                            
+                            Logger.getLogger(DocumentumExportControl.class.getName()).log(Level.SEVERE, null, ex);
                             String error = ex.getMessage().replace(";", "-");
                             tdc.line += ";/////////ERROR////////;" + error;
                             tdc.error = error;
@@ -81,16 +94,21 @@ public class DocumentumExportControl extends Thread {
                         setStop();
                     }
                 } else {
+                    status = "Pausada";
                     sleep(3000);
                 }
                 isActiveRealTime = isActive;
                 pauseRealTime = pause;
             }
 
-        } catch (InterruptedException e) {
+            status = "Finalizada";
 
-            e.printStackTrace();
+        } catch (InterruptedException ex) {
 
+            DtoolLogControl.log(ex, Level.SEVERE);
+
+        } catch (DfException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
         }
 
     }
@@ -122,11 +140,17 @@ public class DocumentumExportControl extends Thread {
     }
 
     public synchronized void setStop() {
+        if (this.isActive) {
+            status = "Finalizando";
+        }
         this.isActive = false;
     }
 
     public synchronized void setPause(boolean p) {
         this.pause = p;
+        if (this.pause) {
+            status = "Aguarndando processamento";
+        }
     }
 
     public boolean getPause() {
@@ -137,12 +161,17 @@ public class DocumentumExportControl extends Thread {
         return fileProcessedNumber;
     }
 
+    public long getFileProcessedSize() {
+        return fileProcessedSize;
+    }
+
     /**
      * Deve ser executada a cada segundo
      */
     public void updateStatistics() {
 
         long lastSecondProcessedNumber = fileProcessedNumber - lastFileProcessedNumber;
+        long lastSecondProcessedSize = fileProcessedSize - lastFileProcessedSize;
 
         if (second == 60) {
             second = 0;
@@ -151,10 +180,14 @@ public class DocumentumExportControl extends Thread {
             minute = 0;
         }
         totalMin = (totalMin - totalMinArray[second]) + lastSecondProcessedNumber;
+        totalSizeMin = (totalSizeMin - totalSizeMinArray[second]) + lastSecondProcessedSize;
         totalMinArray[second] = lastSecondProcessedNumber;
+        totalSizeMinArray[second] = lastSecondProcessedSize;
 
         totalHour = (totalHour - totalHourArray[minute]) + totalMin;
+        totalSizeHour = (totalSizeHour - totalSizeHourArray[minute]) + totalSizeMin;
         totalHourArray[minute] = totalMin;
+        totalSizeHourArray[minute] = totalSizeMin;
 
         if (second == 59) {
             minute++;
@@ -163,6 +196,7 @@ public class DocumentumExportControl extends Thread {
         second++;
 
         lastFileProcessedNumber = fileProcessedNumber;
+        lastFileProcessedSize = fileProcessedSize;
     }
 
     public long getTotalHour() {
@@ -173,16 +207,24 @@ public class DocumentumExportControl extends Thread {
         return totalMin;
     }
 
+    public long getSizeTotalHour() {
+        return totalSizeHour;
+    }
+
+    public long getSizeTotalMinute() {
+        return totalSizeMin;
+    }
+
     public String getsStatus() {
-        String status = "Ativa";
-        if (isActiveRealTime && pauseRealTime) {
-            status = "Pausada";
-        } else if (!isActiveRealTime) {
-            status = "Inativa";
-        }
-
+        /**
+         * String status = "Ativa"; if (isActiveRealTime && pauseRealTime) {
+         * status = "Pausada"; } else if (!isActiveRealTime) { status =
+         * "Inativa"; }
+         *
+         * return status;
+         *
+         */
         return status;
-
     }
 
     public boolean isActive() {

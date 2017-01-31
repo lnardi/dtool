@@ -45,10 +45,12 @@ public class ExportControl extends Thread {
     private DtoolJFrame dtoolJFrame = null;
     private String exportPath = null;
     private String relatieExportPath = null;
+    private int inputLinesSize = 0;
 
-    public ExportControl(Iterator p_inputsLines, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads) throws IOException, DfException {
+    public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads) throws IOException, DfException {
 
         inputsLines = p_inputsLines;
+        inputLinesSize = p_size;
         dctmFolderExtruture = p_dctmFolderExtruture;
         expAllInFolderOrLikeServer = p_expAllInFolderOrLikeServer;
         csvFileName = p_csvFile;
@@ -74,7 +76,7 @@ public class ExportControl extends Thread {
         }
         loadThreads();
     }
-    
+
     public String getRelativePath() {
         return relatieExportPath;
     }
@@ -159,6 +161,10 @@ public class ExportControl extends Thread {
         return tdc;
     }
 
+    public int getInputSize() {
+        return inputLinesSize;
+    }
+
     public void stopThreads() {
 
         for (DocumentumExportControl i : dIControlTheadList) {
@@ -226,6 +232,14 @@ public class ExportControl extends Thread {
                 if (processedLines.size() > 0) {
                     sleep(100);
                 } else {
+
+                    //Verifica se todas as threads não estão inativas por terem finalizado a importação, 
+                    //se todas terminaram está thread pode finalizar também após processar todos os objetos.
+                    active = false;
+                    for (DocumentumExportControl i : dIControlTheadList) {
+                        active = i.isActive() || active;
+                    }
+
                     //Escreve as linhas em memório
                     if (csvErrorOutput != null) {
                         csvErrorOutput.flush();
@@ -248,6 +262,7 @@ public class ExportControl extends Thread {
         } catch (Exception e) {
             // TODO - Como tratar este erro, mas deve paralizar tudo.
             e.printStackTrace();
+            DtoolLogControl.log(e, Level.SEVERE);
         }
     }
 
@@ -265,7 +280,7 @@ public class ExportControl extends Thread {
         csvOutput.write(tdp.line);
         csvOutput.newLine();
         //Se ainda houverem linhas para retornar, cria um novo arquivo
-        if (processedLines.size() > 0 && breakCSV > 0 && (item % breakCSV) == 0) {
+        if (processedLines.size() > 0 && breakCSV > 0 && (tdp.item % breakCSV) == 0) {
 
             //Finaliza o arquivo atual
             csvOutput.flush();

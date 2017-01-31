@@ -264,7 +264,7 @@ public class DtoolExportControl {
 
         // Chamdo o 
         //public ExportControl(Iterator p_inputsLines, String p_path, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID) throws IOException, DfException {
-        return new ExportControl(rows, csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder, p_exportPath, p_numberOfThreads);
+        return new ExportControl(rows, rowsList.size(), csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder, p_exportPath, p_numberOfThreads);
 
     }
 
