@@ -50,7 +50,7 @@ public class DtoolExportControl {
      * especifica qual das possíveis extruturas deve ser exportada. Caso a
      * estrutura excolhida não exista, exportara a extrutura
      */
-    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         long startTime = System.currentTimeMillis();
         if (exportContent) {
@@ -110,6 +110,10 @@ public class DtoolExportControl {
             }
         }
 
+        if (exportServerPath) {
+            header += ";server_path";
+        }
+
         if (exportContent) {
             if (!columnNameFound || columnR_idFound < 0) {
                 throw new Exception("Para exportação do conteúdo, a query deve retornar os campos Object_name e r_object_id");
@@ -138,6 +142,11 @@ public class DtoolExportControl {
             String path = "";
             //Exporta o conteúdo
             try {
+               //carrega o caminho do servidor     
+                if (exportServerPath) {
+                    path = DocumentumUseful.apiExecSize(row[columnR_idFound]);                    
+                    line += ";" + path;                    
+                }
 
                 //Aloca thread, se não houver thread disponível, aguarda uma.
                 if (exportContent) {

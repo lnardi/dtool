@@ -243,6 +243,17 @@ public class DocumentumUseful {
 
     }
 
+    public static String apiExecSize(String q) throws DfException {
+
+        IDfSession session = sessionMgr.getSession(loginDocbase);
+        try {
+            return session.apiGet("getpath", q);
+        } finally {
+            sessionMgr.release(session);
+        }
+
+    }
+
     /**
      * Reverse maps a mime-type to a repository format.
      *
@@ -525,8 +536,8 @@ public class DocumentumUseful {
 
             documentPath += "/" + fileName;
 
-            File file = new File(folderPath);          
-            
+            File file = new File(folderPath);
+
             //Só exporta se o arquivo não existe.
             if (!(file.exists() && file.length() == doc.getContentSize())) {
                 // Create an export node, adding the document to the export operation object.

@@ -255,6 +255,17 @@ public class DocumentumUsefulThreadSafe {
 
     }
 
+    public String apiExecSize(String q) throws DfException {
+
+        IDfSession session = sessionMgr.getSession(loginDocbase);
+        try {
+            return session.apiGet("getpath", q);
+        } finally {
+            sessionMgr.release(session);
+        }
+
+    }
+
     /**
      * Reverse maps a mime-type to a repository format.
      *
@@ -486,7 +497,7 @@ public class DocumentumUsefulThreadSafe {
             if (!(file.exists() && file.length() == doc.getContentSize())) {
                 //Pega o tamanho
                 //TODO - Descomentar
-                /**
+
                 tdc.size = doc.getContentSize();
                 // Create an export node, adding the document to the export operation object.
                 IDfExportNode node = (IDfExportNode) eo.add(doc);
@@ -497,21 +508,15 @@ public class DocumentumUsefulThreadSafe {
 
                     throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
                 }
-                **/
-                ////TODO - REMOVER, É SÓ PARA TESTES
-                Writer writer = null;
-                try {
-                    writer = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(folderPath), "utf-8"));
-                    writer.write("Something");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    try {
-                        writer.close();
-                    } catch (Exception ex) {/*ignore*/
-                    }
-                }
+                /**
+                 * ////TODO - REMOVER, É SÓ PARA TESTES Writer writer = null;
+                 * try { writer = new BufferedWriter(new OutputStreamWriter( new
+                 * FileOutputStream(folderPath), "utf-8"));
+                 * writer.write("Something"); } catch (IOException ex) {
+                 * ex.printStackTrace(); } finally { try { writer.close(); }
+                 * catch (Exception ex) { } }
+                 *
+                 */
 
             }
         } finally {
