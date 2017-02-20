@@ -16,4 +16,5 @@ package br.com.mavalu.dtool.export;
     public boolean success = true;
     public String error = null;
     public boolean processed = false;
+    public long size = 0;
 }
