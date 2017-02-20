@@ -263,7 +263,8 @@ public class QueryList extends javax.swing.JPanel {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         int row = jTable1.getSelectedRow();
 
-        String foo = (String) jTable1.getModel().getValueAt(row, 1);
+        String foo = (String) jTable1.getModel().getValueAt(jTable1.
+                          convertRowIndexToModel(row), 1);
         dtoolJFrame.operationControl(dtoolJFrame.OP_SET_QUERY, true, new String[]{foo});
 
     }//GEN-LAST:event_jTable1MouseClicked
