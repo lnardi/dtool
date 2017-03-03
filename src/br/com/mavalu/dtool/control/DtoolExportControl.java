@@ -50,7 +50,7 @@ public class DtoolExportControl {
      * especifica qual das possíveis extruturas deve ser exportada. Caso a
      * estrutura excolhida não exista, exportara a extrutura
      */
-    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath, boolean breakCSVByIchronicleid) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         long startTime = System.currentTimeMillis();
         if (exportContent) {
@@ -84,7 +84,10 @@ public class DtoolExportControl {
 //new java.io.BufferedWriter(new java.io.FileWriter(file));
         String columnR_id = "r_object_id";
         String columnName = "object_name";
+        String columnI_chronicle_id = "i_chronicle_id";
         int columnR_idFound = -1;
+        int columnI_chronicle_idFound = -1;
+        boolean breakCSVTemp = false;
         boolean columnNameFound = false;
         long item = 0; //Númera as lihas exportadas 
         long erros = 0;//Conta o número de exports com erro;
@@ -102,6 +105,9 @@ public class DtoolExportControl {
             header += ";" + value;
 
             //Valida se as colunas estão presentes
+            if (value.equals(columnI_chronicle_id)) {
+                columnI_chronicle_idFound = i;//Utilizo a posição para pegar o valor depois na linha;
+            }
             if (value.equals(columnR_id)) {
                 columnR_idFound = i;//Utilizo a posição para pegar o valor depois na linha;
             }
@@ -118,7 +124,9 @@ public class DtoolExportControl {
             if (!columnNameFound || columnR_idFound < 0) {
                 throw new Exception("Para exportação do conteúdo, a query deve retornar os campos Object_name e r_object_id");
             }
-
+            if (breakCSVByIchronicleid && columnI_chronicle_idFound < 0) {
+                throw new Exception("Para exportação quebrando CSV por I_chronicle_id a coluna deve existir");
+            }
             header += ";file_path;error";
 
         }
@@ -128,10 +136,36 @@ public class DtoolExportControl {
 
         Iterator<String[]> rows = rowsList.iterator();
         String[] row = null;
+        String lastChronicle_id = null;
 
         //Processa os arquivos retornados
         while (rows.hasNext()) {
+
+            lastChronicle_id = row != null ? row[columnI_chronicle_idFound] : null;
+
             row = rows.next();
+
+            //Gera um novo arquivo se o usuário solicitou quebra e se é para quebrar por chronicle_id
+            if (rows.hasNext() && breakCSV > 0 && item != 0 && ((item % breakCSV) == 0 || breakCSVTemp)) {
+
+                if (breakCSVByIchronicleid && row[columnI_chronicle_idFound].equals(lastChronicle_id)) {//Finaliza o arquivo atual
+                    breakCSVTemp = true;//Verifica novamente na próxima linha
+                } else {
+                    csv.flush();
+                    csv.close();
+                    //Cria o próximo arquivo
+                    fileNumber++;
+                    finalName = beforeDot + "_" + fileNumber + afterDot;
+                    fileOutput = new File(finalName);
+                    csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                    //Insere o cabeçalho na próxima planilha
+                    csv.write(header);
+                    csv.newLine();
+
+                    breakCSVTemp = false; //Retorna ao contador original do break
+                }
+            }
+
             ++item;
             line = String.valueOf(item);//Número da linha
             //Copia os valores da linha para gerar o output
@@ -142,10 +176,10 @@ public class DtoolExportControl {
             String path = "";
             //Exporta o conteúdo
             try {
-               //carrega o caminho do servidor     
+                //carrega o caminho do servidor     
                 if (exportServerPath) {
-                    path = DocumentumUseful.apiExecSize(row[columnR_idFound]);                    
-                    line += ";" + path;                    
+                    path = DocumentumUseful.apiExecSize(row[columnR_idFound]);
+                    line += ";" + path;
                 }
 
                 //Aloca thread, se não houver thread disponível, aguarda uma.
@@ -181,21 +215,6 @@ public class DtoolExportControl {
 
                 csvError.newLine();
 
-            }
-
-            if (rows.hasNext() && breakCSV > 0 && (item % breakCSV) == 0) {
-
-                //Finaliza o arquivo atual
-                csv.flush();
-                csv.close();
-                //Cria o próximo arquivo
-                fileNumber++;
-                finalName = beforeDot + "_" + fileNumber + afterDot;
-                fileOutput = new File(finalName);
-                csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
-                //Insere o cabeçalho na próxima planilha
-                csv.write(header);
-                csv.newLine();
             }
 
         }
