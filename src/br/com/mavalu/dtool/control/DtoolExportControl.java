@@ -141,7 +141,7 @@ public class DtoolExportControl {
         //Processa os arquivos retornados
         while (rows.hasNext()) {
 
-            lastChronicle_id = row != null ? row[columnI_chronicle_idFound] : null;
+            lastChronicle_id = row != null && columnI_chronicle_idFound != -1 ? row[columnI_chronicle_idFound] : null;
 
             row = rows.next();
 
