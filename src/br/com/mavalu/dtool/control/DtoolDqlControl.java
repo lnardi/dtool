@@ -127,4 +127,8 @@ public class DtoolDqlControl {
       return exportOK;
    }
 
+    public static void executeScript(String text, boolean jTextArea2Edited) {
+        //Executa uma query em todos os registros listados no grid
+    }
+
 }
