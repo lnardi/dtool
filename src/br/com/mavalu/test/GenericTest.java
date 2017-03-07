@@ -30,6 +30,13 @@ public class GenericTest {
       //System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));
       System.out.println("String: " + a.replaceAll("\\;|\\r|\\n", "#"));
 
+      
+      
+       for (int i = 1; i < 100; i++) {
+           System.out.println("Result: I= " + i + " %: " + i%10);
+       }
+      
+      
       /**
        * try {
        *

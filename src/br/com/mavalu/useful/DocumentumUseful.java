@@ -243,15 +243,20 @@ public class DocumentumUseful {
 
     }
 
-    public static String apiExecSize(String q) throws DfException {
+    public static String apiExecSize(String p_id) throws DfException {
 
         IDfSession session = sessionMgr.getSession(loginDocbase);
         try {
-            return session.apiGet("getpath", q);
+            IDfDocument doc
+                    = (IDfDocument) session.getObject(new DfId(p_id));
+            //VErifica se possui conteúdo.
+            if (doc.getContentSize() == 0) {
+                return "";
+            }
+            return session.apiGet("getpath", p_id);
         } finally {
             sessionMgr.release(session);
         }
-
     }
 
     /**
