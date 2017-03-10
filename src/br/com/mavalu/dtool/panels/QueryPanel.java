@@ -473,7 +473,7 @@ public class QueryPanel extends javax.swing.JPanel {
                 } else {
 
                     DtoolDqlControl.executeQuery(jTextArea2.getText(), jTable1, (String) jComboBox1.getSelectedItem(),
-                            (String) jComboBox2.getSelectedItem(), jTextArea2Edited);
+                            (String) jComboBox2.getSelectedItem(), jTextArea2Edited, dtoolJFrame.dateFormat);
 
                     //Exibe o número de linhas retornadas
                     queryTableModel = (LoginTableModel) jTable1.getModel();

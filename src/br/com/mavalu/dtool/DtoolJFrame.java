@@ -41,6 +41,7 @@ public class DtoolJFrame extends javax.swing.JFrame {
     public final static int OP_SET_QUERY = 6;
     public final static int OP_EXPORT = 7;
     public final static int OP_EXPORT_COUNT = 8;
+    public int dateFormat = 0;
 
     private static Logger logger = Logger.getLogger(DtoolJFrame.class.getName());
 

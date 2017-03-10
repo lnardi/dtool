@@ -463,7 +463,7 @@ public class ScriptPanel extends javax.swing.JPanel {
             protected Object doInBackground() throws Exception {
 
                 DtoolDqlControl.executeQuery(jTextArea2.getText(), jTable1, (String) jComboBox1.getSelectedItem(),
-                        (String) jComboBox2.getSelectedItem(), jTextArea2Edited);
+                        (String) jComboBox2.getSelectedItem(), jTextArea2Edited, dtoolJFrame.dateFormat);
 
                 //Exibe o número de linhas retornadas
                 queryTableModel = (LoginTableModel) jTable1.getModel();

@@ -22,7 +22,7 @@ import javax.swing.table.TableColumn;
  */
 public class DtoolDqlControl {
 
-   public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited) throws DfException {
+   public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited, int dateFormat) throws DfException {
 
       DtoolLogControl.log("Executando query : " + q, Level.INFO);
 
@@ -35,7 +35,7 @@ public class DtoolDqlControl {
             pg = "0";
          }
 
-         LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg));
+         LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg), dateFormat);
          TableColumn column = null;
 
          jTable1.setModel(queryTM);

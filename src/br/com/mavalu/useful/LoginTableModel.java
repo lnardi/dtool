@@ -8,6 +8,8 @@ package br.com.mavalu.useful;
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
+import com.documentum.fc.common.IDfTime;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -18,180 +20,218 @@ import javax.swing.table.AbstractTableModel;
  */
 public class LoginTableModel extends AbstractTableModel {
 
-   private List<String> columns;
+    private static int dateFormat = 0;
 
-   public List<String> getColumns() {
-      return columns;
-   }
+    private List<String> columns;
 
-   public List<String[]> getRows() {
-      return rows;
-   }
-   private List<String[]> rows;
-   private int columnSize[] = null;
-   private int page = 1;
-   private int pageSize = 10;
+    public List<String> getColumns() {
+        return columns;
+    }
 
-   public int[] getColumnSize() {
-      return columnSize;
-   }
+    public List<String[]> getRows() {
+        return rows;
+    }
+    private List<String[]> rows;
+    private int columnSize[] = null;
+    private int page = 1;
+    private int pageSize = 10;
 
-   public LoginTableModel(IDfCollection col, int pg) throws DfException {
+    public int[] getColumnSize() {
+        return columnSize;
+    }
 
-      columns = new <String> ArrayList();
-      rows = new <String[]> ArrayList();
-      String row[] = new String[0];
-      int attributes = 0;
-      int lenght = 0;
-      String attributeName = null;
-      pageSize = pg;
+    public LoginTableModel(IDfCollection col, int pg, int dtFormat) throws DfException {
+        loadData(col, pg);
+        dateFormat = dtFormat;
+    }
 
-      String value = null;
+    public LoginTableModel(IDfCollection col, int pg) throws DfException {
+        loadData(col, pg);
+    }
 
-      if (col.next()) {
+    private void loadData(IDfCollection col, int pg) throws DfException {
 
-         attributes = col.getAttrCount();
-         columnSize = new int[attributes];
+        columns = new <String> ArrayList();
+        rows = new <String[]> ArrayList();
+        String row[] = new String[0];
+        int attributes = 0;
+        int lenght = 0;
+        String attributeName = null;
+        pageSize = pg;
 
-         for (int i = 0; i < attributes; i++) {
-            attributeName = col.getAttr(i).getName();
-            columns.add(attributeName);
-            columnSize[i] = attributeName.length();
-         }
-         row = new String[columns.size()];
+        String value = null;
 
-         for (int i = 0; i < attributes; i++) {
+        if (col.next()) {
 
-            if (col.getAttr(i).isRepeating()) {
-               row[i] = col.getAllRepeatingStrings(columns.get(i), "|");
-            } else {
-               row[i] = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
+            attributes = col.getAttrCount();
+            columnSize = new int[attributes];
+
+            for (int i = 0; i < attributes; i++) {
+                attributeName = col.getAttr(i).getName();
+                columns.add(attributeName);
+                columnSize[i] = attributeName.length();
             }
+            row = new String[columns.size()];
 
-            lenght = row[i].length();
-            if (lenght > columnSize[i]) {
-               columnSize[i] = lenght;
+            for (int i = 0; i < attributes; i++) {
+
+                if (col.getAttr(i).isRepeating()) {
+                    row[i] = col.getAllRepeatingStrings(columns.get(i), "|");
+                } else {
+                    if (col.getAttr(i).getDataType() == IDfAttr.DM_DOUBLE) {
+                        row[i] = String.valueOf(col.getValueAt(i).asDouble());
+                    }
+                    if (col.getAttr(i).getDataType() == IDfAttr.DM_TIME) {
+                        if (dateFormat == 0) {
+                            row[i] = col.getValueAt(i).asTime().asString(IDfTime.DF_TIME_PATTERN44);
+                        } else {
+                            row[i] = col.getValueAt(i).asTime().asString(IDfTime.DF_TIME_PATTERN18);
+                        }
+                    } else {
+                        row[i] = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
+                    }
+                }
+
+                lenght = row[i].length();
+                if (lenght > columnSize[i]) {
+                    columnSize[i] = lenght;
+                }
+
             }
+            rows.add(row);
 
-         }
-         rows.add(row);
+        }
 
-      }
+        while (col.next()) {
+            row = new String[columns.size()];
 
-      while (col.next()) {
-         row = new String[columns.size()];
+            for (int i = 0; i < attributes; i++) {
 
-         for (int i = 0; i < attributes; i++) {
+                if (col.getAttr(i).isRepeating()) {
+                    value = col.getAllRepeatingStrings(columns.get(i), "|");
+                } else {
+                    if (col.getAttr(i).getDataType() == IDfAttr.DM_DOUBLE) {
+                        value = String.valueOf(col.getValueAt(i).asDouble());
 
-            if (col.getAttr(i).isRepeating()) {
-               value = col.getAllRepeatingStrings(columns.get(i), "|");
-            } else {
-               if (col.getAttr(i).getDataType() == IDfAttr.DM_DOUBLE) {
-                  value = String.valueOf(col.getValueAt(i).asDouble());
+                    }
+                    if (col.getAttr(i).getDataType() == IDfAttr.DM_TIME) {
+                        if (dateFormat == 0) {
+                            value = col.getValueAt(i).asTime().asString(IDfTime.DF_TIME_PATTERN44);
+                        } else {
+                            value = col.getValueAt(i).asTime().asString(IDfTime.DF_TIME_PATTERN18);
+                        }
+                    } else {
+                        value = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
+                    }
+                }
 
-               } else {
-                  value = col.getValueAt(i).asString().replaceAll("\\r|\\n", " ");
-               }
+                row[i] = value;
+                lenght = value.length();
+                if (lenght > columnSize[i]) {
+                    columnSize[i] = (columnSize[i] + lenght) / 2;
+                }
             }
+            rows.add(row);
 
-            row[i] = value;
-            lenght = value.length();
-            if (lenght > columnSize[i]) {
-               columnSize[i] = (columnSize[i] + lenght) / 2;
-            }
-         }
-         rows.add(row);
+        }
 
-      }
+        if (pageSize == 0) {
+            pageSize = rows.size();
+        }
 
-      if (pageSize == 0) {
-         pageSize = rows.size();
-      }
+        col.close();
+    }
 
-      col.close();
-   }
+    @Override
+    public String getColumnName(int i
+    ) {
+        return columns.get(i);
+    }
 
-   @Override
-   public String getColumnName(int i
-   ) {
-      return columns.get(i);
-   }
+    public int getColumnCount() {
+        return columns.size();
+    }
 
-   public int getColumnCount() {
-      return columns.size();
-   }
+    public int getRowCount() {
 
-   public int getRowCount() {
+        int initialRow = (page - 1) * pageSize;
 
-      int initialRow = (page - 1) * pageSize;
+        int diff = rows.size() - initialRow;
 
-      int diff = rows.size() - initialRow;
+        return (diff > pageSize) ? pageSize : diff;
 
-      return (diff > pageSize) ? pageSize : diff;
+        // return rows.size();
+        //return pageSize;
+    }
 
-      // return rows.size();
-      //return pageSize;
-   }
+    public Object getValueAt(int r, int c) {
 
-   public Object getValueAt(int r, int c) {
+        return (rows.get(computeRow(r)))[c];
+    }
 
-      return (rows.get(computeRow(r)))[c];
-   }
+    /**
+     * Metodo deve ser removido
+     *
+     * @param p
+     */
+    public void setPage(int p) {
+        page = p;
+    }
 
-   /**
-    * Metodo deve ser removido
-    *
-    * @param p
-    */
-   public void setPage(int p) {
-      page = p;
-   }
+    public void setPageSize(int ps) {
+        pageSize = ps;
+        page = 1;
+    }
 
-   public void setPageSize(int ps) {
-      pageSize = ps;
-      page = 1;
-   }
+    public boolean nextPage() {
 
-   public boolean nextPage() {
+        boolean canIncrese = page < getMaxPageNumber();
 
-      boolean canIncrese = page < getMaxPageNumber();
+        page = canIncrese ? ++page : page;
 
-      page = canIncrese ? ++page : page;
+        return canIncrese;
 
-      return canIncrese;
+    }
 
-   }
+    public boolean previousPage() {
 
-   public boolean previousPage() {
+        boolean canIncrese = page > 1;
 
-      boolean canIncrese = page > 1;
+        page = canIncrese ? --page : page;
 
-      page = canIncrese ? --page : page;
+        return canIncrese;
 
-      return canIncrese;
+    }
 
-   }
+    public int getMaxPageNumber() {
+        int pgs = rows.size() / pageSize;
+        int rst = rows.size() % pageSize;
+        return (rst) > 0 ? ++pgs : pgs;
+    }
 
-   public int getMaxPageNumber() {
-      int pgs = rows.size() / pageSize;
-      int rst = rows.size() % pageSize;
-      return (rst) > 0 ? ++pgs : pgs;
-   }
+    /**
+     * Retonar o número de lihas existente na query
+     *
+     * @return
+     */
+    public int getMaxRowsCount() {
+        return rows.size();
+    }
 
-   /**
-    * Retonar o número de lihas existente na query
-    *
-    * @return
-    */
-   public int getMaxRowsCount() {
-      return rows.size();
-   }
+    private int computeRow(int r) {
+        return ((page - 1) * pageSize) + r;
+    }
 
-   private int computeRow(int r) {
-      return ((page - 1) * pageSize) + r;
-   }
+    public int getPage() {
+        return page;
+    }
 
-   public int getPage() {
-      return page;
-   }
+    /**
+     * Define o formado ta data que será exibido na tabela.
+     *
+     * @param format 1 para dd/mm/yyyy e 2 para mm/dd/yyyy
+     */
+    public void setDateFormat(int format) {
+        dateFormat = format;
+    }
 }
