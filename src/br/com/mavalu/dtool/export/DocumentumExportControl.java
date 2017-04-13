@@ -2,20 +2,10 @@ package br.com.mavalu.dtool.export;
 
 import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.useful.DocumentumUsefulThreadSafe;
-import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-
-import com.documentum.fc.client.IDfDocument;
 import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
-import com.documentum.fc.common.DfTime;
 import com.documentum.fc.common.IDfLoginInfo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,8 +66,13 @@ public class DocumentumExportControl extends Thread {
                     tdc = getNextLine();
                     if (tdc != null && tdc.line != null) {
                         try {
+                            String path = null;
+                            if (mc.exportServerPath()){
+                                 path = documentumUseful.apiExecSize(tdc.id);
+                            } else {
                             //importa o conteúdo para docbase
-                            String path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
+                            path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
+                            }
                             tdc.line += ";" + path;
                             fileProcessedNumber++;
                             fileProcessedSize += tdc.size;

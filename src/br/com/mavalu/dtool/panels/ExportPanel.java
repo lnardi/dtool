@@ -33,6 +33,7 @@ public class ExportPanel extends javax.swing.JPanel {
     private static String path = null;
     private ExportControl ec = null;
     private static String file_name = null;
+    private static long split_line_number = 0;
 
     /**
      * Creates new form ExportPanel
@@ -55,6 +56,10 @@ public class ExportPanel extends javax.swing.JPanel {
 
         if (file_name != null) {
             jTextField2.setText(file_name);
+        }
+        
+        if (split_line_number != 0){
+            jSpinner1.setValue(split_line_number);
         }
 
     }
@@ -174,7 +179,7 @@ public class ExportPanel extends javax.swing.JPanel {
             }
         });
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(50, 1, 1000000, 10000));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Long.valueOf(10000L), Long.valueOf(1L), Long.valueOf(1000000L), Long.valueOf(1000L)));
 
         jCheckBox1.setText("Exportar conteúdo ( baseado no atributo r_object_id)");
         jCheckBox1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -254,8 +259,7 @@ public class ExportPanel extends javax.swing.JPanel {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(21, 21, 21)
-                                .addComponent(jLabel3)
-                                .addGap(49, 49, 49))
+                                .addComponent(jLabel3))
                             .addComponent(jRadioButton3)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jCheckBox3)
@@ -435,6 +439,7 @@ public class ExportPanel extends javax.swing.JPanel {
        jDialog.setVisible(false);
        file_name = jTextField2.getText();
        path = jTextField1.getText();
+       
 
        // jRadioButton5 ==> Reexecutar a query e exportar o resultado;
        // jRadioButton4 ==>Exportar resultado apresentado no grid:
@@ -451,13 +456,13 @@ public class ExportPanel extends javax.swing.JPanel {
                    //Pega o nome do arquivo e caminho existente na tela.
                    csvFile = jTextField1.getText() + "\\" + jTextField2.getText();
 
-                   long value = 0;
+                   
 
                    if (jSpinner1.getValue() instanceof Integer) {
 
-                       value = ((Integer) jSpinner1.getValue()).longValue();
+                       split_line_number = ((Integer) jSpinner1.getValue()).longValue();
                    } else {
-                       value = (Long) jSpinner1.getValue();
+                       split_line_number = (Long) jSpinner1.getValue();
                    }
 
                    long numberOfThreads = 0;
@@ -469,11 +474,11 @@ public class ExportPanel extends javax.swing.JPanel {
                        numberOfThreads = (Long) jSpinner2.getValue();
                    }
 
-                   if (jCheckBox1.isSelected()) {
+                   if (jCheckBox1.isSelected() || jCheckBox4.isSelected()) {
                        long startTime = System.currentTimeMillis();
 
                        ec = DtoolExportControl.exportQueryGridThreads(csvFile,
-                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? value : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads);
+                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads, jCheckBox4.isSelected());
 
                        ExportThreadPanel etp = new ExportThreadPanel(ec, dtoolJFrame, jDialog);
                        jDialog.setContentPane(etp);
@@ -485,7 +490,7 @@ public class ExportPanel extends javax.swing.JPanel {
                    } else {
 
                        DtoolExportControl.exportQueryGrid(csvFile,
-                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? value : 0), jCheckBox4.isSelected(), jCheckBox5.isSelected());
+                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox4.isSelected(), jCheckBox5.isSelected());
                    }
 
                } catch (Exception ex) {

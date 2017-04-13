@@ -44,8 +44,7 @@ public class DocumentumUsefulThreadSafe {
 
     /**
      * @param q String com a query
-     * @param type Define o tipo de query. 0 para select e 1 para update.
-     * Existem outros tipos que podem ser implementados.
+     * @param type Define o tipo de query. 0 para select e 1 para update. Existem outros tipos que podem ser implementados.
      * @param top Defini se a query utilizar o return_top e a quantidade
      * @return Cole��o de objetos
      * @throws DfException
@@ -258,6 +257,13 @@ public class DocumentumUsefulThreadSafe {
     public String apiExecSize(String q) throws DfException {
 
         IDfSession session = sessionMgr.getSession(loginDocbase);
+
+        IDfDocument doc
+                = (IDfDocument) session.getObject(new DfId(q));
+        //VErifica se possui conteúdo.
+        if (doc.getContentSize() == 0) {
+            return "";
+        }
         try {
             return session.apiGet("getpath", q);
         } finally {
@@ -270,8 +276,7 @@ public class DocumentumUsefulThreadSafe {
      * Reverse maps a mime-type to a repository format.
      *
      * @param ext The DOS extention whitout dot "."
-     * @return The corresponding repository format. If multiple formats are
-     * found <br>
+     * @return The corresponding repository format. If multiple formats are found <br>
      * the first one is returned by default. A <code>null</code> is <br>
      * returned if no format can be found.
      */
@@ -509,12 +514,9 @@ public class DocumentumUsefulThreadSafe {
                     throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
                 }
                 /**
-                 * ////TODO - REMOVER, É SÓ PARA TESTES Writer writer = null;
-                 * try { writer = new BufferedWriter(new OutputStreamWriter( new
-                 * FileOutputStream(folderPath), "utf-8"));
-                 * writer.write("Something"); } catch (IOException ex) {
-                 * ex.printStackTrace(); } finally { try { writer.close(); }
-                 * catch (Exception ex) { } }
+                 * ////TODO - REMOVER, É SÓ PARA TESTES Writer writer = null; try { writer = new BufferedWriter(new OutputStreamWriter( new
+                 * FileOutputStream(folderPath), "utf-8")); writer.write("Something"); } catch (IOException ex) { ex.printStackTrace(); } finally { try {
+                 * writer.close(); } catch (Exception ex) { } }
                  *
                  */
 

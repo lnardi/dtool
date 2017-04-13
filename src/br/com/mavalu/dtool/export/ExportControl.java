@@ -46,8 +46,9 @@ public class ExportControl extends Thread {
     private String exportPath = null;
     private String relatieExportPath = null;
     private int inputLinesSize = 0;
+    private boolean exportServerPath = false;
 
-    public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads) throws IOException, DfException {
+    public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath) throws IOException, DfException {
 
         inputsLines = p_inputsLines;
         inputLinesSize = p_size;
@@ -59,6 +60,7 @@ public class ExportControl extends Thread {
         breakCSV = p_breakCSV;
         dtoolJFrame = p_dtoolJFrame;
         exportPath = p_exportPath;
+        exportServerPath = p_exportServerPath;//Gera uma coluna com o caminho do arquivo no servidor
         if (p_numberOfThreads >= 1) {
             numberOfThreads = (int) p_numberOfThreads;
         } else {
@@ -334,5 +336,9 @@ public class ExportControl extends Thread {
 
     public int getWaitingProcessing() {
         return processedLines.size();
+    }
+
+    public boolean exportServerPath() {
+        return exportServerPath;
     }
 }
