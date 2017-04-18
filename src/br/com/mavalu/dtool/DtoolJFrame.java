@@ -11,6 +11,7 @@ import br.com.mavalu.dtool.panels.QueryPanel;
 import br.com.mavalu.dtool.panels.LogPanel;
 import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.dtool.panels.DtoolSplashScreen;
+import br.com.mavalu.dtool.panels.ScriptPanel;
 import br.com.mavalu.useful.DbUseful;
 import java.awt.Dimension;
 import java.io.FileInputStream;
@@ -31,6 +32,7 @@ public class DtoolJFrame extends javax.swing.JFrame {
     private final LogPanel logPanel;
     private final LoginPanel loginPanel;
     private final QueryPanel queryPanel;
+    private final ScriptPanel scriptPanel;
     private final DumpPanel dumpPanel;
     public final static int OP_SERVER_CONNECTION = 0;
     public final static int OP_LOGIN = 1;
@@ -41,6 +43,7 @@ public class DtoolJFrame extends javax.swing.JFrame {
     public final static int OP_SET_QUERY = 6;
     public final static int OP_EXPORT = 7;
     public final static int OP_EXPORT_COUNT = 8;
+    public final static int OP_SCRIPT_SHOW = 9;
     public int dateFormat = 0;
 
     private static Logger logger = Logger.getLogger(DtoolJFrame.class.getName());
@@ -67,11 +70,14 @@ public class DtoolJFrame extends javax.swing.JFrame {
 
         loginPanel = new LoginPanel(this);
         queryPanel = new QueryPanel(this);
+        scriptPanel = new ScriptPanel(this);
         dumpPanel = new DumpPanel(this);
 
         jTabbedPane1.addTab("Login", loginPanel);
         jTabbedPane1.addTab("Query", queryPanel);
         jTabbedPane1.addTab("Dump", dumpPanel);
+        jTabbedPane1.addTab("Script", scriptPanel);
+        
 
         jSplitPane1.setRightComponent(logPanel);
 
@@ -98,16 +104,16 @@ public class DtoolJFrame extends javax.swing.JFrame {
      * @param op - Operação: SERVER_CONNECTION = 0; LOGIN = 1; LOGIN_CREDENTIALS
      * = 2; PROGRESS_BAR = 3; DUMP = 4; EXPORT = 7;
      * @param status Flag que seta o status nos componentes;
-     * @param list Array de String com valores que devem ser tratados em cada
-     * status. Não é feito um controle de tamaho
-     */
-    public void operationControl(int op, boolean status, String[] list) {
+     * @param obj Qualquer objeto com status, informações para processamento.
+    **/
+    public void operationControl(int op, boolean status, Object obj) {
 
         
-        this.logPanel.operationControl(op, status, list);
-        this.dumpPanel.operationControl(op, status, list);
-        this.loginPanel.operationControl(op, status, list);
-        this.queryPanel.operationControl(op, status, list);       
+        this.logPanel.operationControl(op, status, obj);
+        this.dumpPanel.operationControl(op, status, obj);
+        this.loginPanel.operationControl(op, status, obj);
+        this.queryPanel.operationControl(op, status, obj);       
+        this.scriptPanel.operationControl(op, status, obj);       
 
         switch (op) {
             case DtoolJFrame.OP_DUMP: 
@@ -115,6 +121,10 @@ public class DtoolJFrame extends javax.swing.JFrame {
                     jTabbedPane1.setSelectedIndex(2);
                 }
                 break;
+            case DtoolJFrame.OP_SCRIPT_SHOW: 
+                    jTabbedPane1.setSelectedIndex(3);
+                break;
+                
         }
 
     }

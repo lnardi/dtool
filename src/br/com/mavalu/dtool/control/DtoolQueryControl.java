@@ -8,6 +8,7 @@ package br.com.mavalu.dtool.control;
 import br.com.mavalu.useful.DbUseful;
 import br.com.mavalu.useful.DocumentumUseful;
 import br.com.mavalu.useful.Login;
+import br.com.mavalu.useful.LoginTableModel;
 import br.com.mavalu.useful.QueryTableModel;
 import com.documentum.fc.common.DfException;
 import java.sql.ResultSet;
@@ -29,14 +30,14 @@ import javax.swing.table.TableColumn;
  */
 public class DtoolQueryControl {
 
-    public static void loadQueries(JTable jTable1, String docbase) {
+    public static void loadQueries(JTable jTable1, String docbase, boolean template) {
 
         String query = null;
         //Pegar o Host e montar a query
         if (docbase == "Todos") {
-            query = "Select \"id\", \"query\",\"DOCBASE\", \"creation_time\" from luc.\"dql_queries\" order by \"creation_time\" DESC";
+            query = "Select \"id\", \"query\",\"DOCBASE\", \"creation_time\" from luc.\"dql_queries\" where \"TEMPLATE\" = " + template + " order by \"creation_time\" DESC";
         } else {
-            query = "Select \"id\", \"query\",\"DOCBASE\", \"creation_time\" from luc.\"dql_queries\" where \"DOCBASE\" = '" + docbase + "' order by \"creation_time\" DESC";
+            query = "Select \"id\", \"query\",\"DOCBASE\", \"creation_time\" from luc.\"dql_queries\" where \"DOCBASE\" = '" + docbase + "' AND \"TEMPLATE\" = " + template +  " order by \"creation_time\" DESC";
         }
 
         TableColumn column = null;
@@ -89,15 +90,22 @@ public class DtoolQueryControl {
 //Pegar o Host e montar a query
 
         Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+        String docbaseName = null;
+        //String hostName = null;
+
+        //hostName = DocumentumUseful.getHostName();
+        docbaseName = DocumentumUseful.getDocbase();
+
+        query = query.trim();//.replaceAll("(\\r|\\n)", "");
+
+        String insertQuery = "INSERT INTO LUC.\"dql_queries\" (\"DOCBASE\", \"query\", \"creation_time\", \"query_hash\") VALUES ('" + docbaseName + "','" + query.replace("'", "''") + "','" + currentTimestamp + "', " + query.hashCode()
+                + " ) ";
+        return insertQuery(insertQuery, query.hashCode());
+    }
+
+    private static int insertQuery(String insertQuery, int hashCode) {
+
         try {
-            String hostName = DocumentumUseful.getHostName();
-            String docbaseName = DocumentumUseful.getDocbase();
-
-            query = query.trim();//.replaceAll("(\\r|\\n)", "");
-
-            String insertQuery = "INSERT INTO LUC.\"dql_queries\" (\"DOCBASE\", \"query\", \"creation_time\", \"query_hash\") VALUES ('" + docbaseName + "','" + query.replace("'", "''") + "','" + currentTimestamp + "', " + query.hashCode()
-                    + " ) ";
-
             //FAzer um select na tabela de logins utilizando a docbase e o Host            
             return DbUseful.updateQuery(insertQuery);
             //DtoolLogControl.log("Linhas afetadas: " + result, Level.SEVERE);
@@ -108,7 +116,9 @@ public class DtoolQueryControl {
             if (!ex.getMessage().contains("QUERY_HASH")) {
                 DtoolLogControl.log(ex, Level.SEVERE);
             } else {
-                String updateQuery = "UPDATE LUC.\"dql_queries\" set \"creation_time\" = \'" + currentTimestamp + "\' WHERE \"query_hash\" = " + query.hashCode();
+                Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+
+                String updateQuery = "UPDATE LUC.\"dql_queries\" set \"creation_time\" = \'" + currentTimestamp + "\' WHERE \"query_hash\" = " + hashCode;
                 //FAzer um select na tabela de logins utilizando a docbase e o Host            
                 try {
                     return DbUseful.updateQuery(updateQuery);
@@ -118,11 +128,9 @@ public class DtoolQueryControl {
                     DtoolLogControl.log(ex1, Level.SEVERE);
                 }
             }
-        } catch (DfException ex) {
-            DtoolLogControl.log(ex, Level.SEVERE);
         }
-
         return 0;
+
     }
 
     public static int removeQuerys(int[] rows, QueryTableModel model) {
@@ -183,6 +191,21 @@ public class DtoolQueryControl {
 
     public static void setSelectedDocbase(JComboBox<String> jComboBox2) {
         jComboBox2.setSelectedItem(DocumentumUseful.getDocbase());
+    }
+
+    public static int storeQuery(String query, boolean b) {
+        Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+        String docbaseName = null;
+        //String hostName = null;
+
+        //hostName = DocumentumUseful.getHostName();
+        docbaseName = DocumentumUseful.getDocbase();
+
+        query = query.trim();//.replaceAll("(\\r|\\n)", "");
+
+        String insertQuery = "INSERT INTO LUC.\"dql_queries\" (\"DOCBASE\", \"query\", \"creation_time\", \"query_hash\", \"TEMPLATE\") VALUES ('" + docbaseName + "','" + query.replace("'", "''") + "','" + currentTimestamp + "', " + query.hashCode() + ", " + b 
+                + " ) ";
+        return insertQuery(insertQuery, query.hashCode());
     }
 
 }

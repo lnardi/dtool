@@ -40,6 +40,10 @@ public class LoginTableModel extends AbstractTableModel {
         return columnSize;
     }
 
+    public LoginTableModel(int dtFormat) {
+        dateFormat = dtFormat;
+    }
+
     public LoginTableModel(IDfCollection col, int pg, int dtFormat) throws DfException {
         loadData(col, pg);
         dateFormat = dtFormat;
@@ -143,8 +147,7 @@ public class LoginTableModel extends AbstractTableModel {
     }
 
     @Override
-    public String getColumnName(int i
-    ) {
+    public String getColumnName(int i) {
         return columns.get(i);
     }
 
@@ -233,5 +236,71 @@ public class LoginTableModel extends AbstractTableModel {
      */
     public void setDateFormat(int format) {
         dateFormat = format;
+    }
+
+    public void executeScriptTemplate(LoginTableModel queryTableModel, String scriptTemplate) {
+
+        columns = new <String> ArrayList();
+        rows = new <String[]> ArrayList();
+
+        //Só tem uma coluna chamada script Cria o cabeçalho
+        columnSize = new int[1];
+        columns.add("Script");
+        columnSize[0] = scriptTemplate.length();
+
+        String key = "@Value(";
+        List<String[]> queryRows = queryTableModel.getRows();
+        List<String> queryRowColumns = queryTableModel.getColumns();
+        List<String> queryColumns = getColumnList(scriptTemplate);
+        int[] columIndex = getColumnIndex(queryRowColumns, queryColumns);
+        String query = null;
+        int lenght = -1;
+        //para cada linha de registro
+        for (String[] queryRow : queryRows) {
+            query = scriptTemplate;
+            for (int i = 0; i < columIndex.length; i++) {
+                query = query.replace(key + queryColumns.get(i) + ")", queryRow[columIndex[i]]);
+            }
+            rows.add(new String[]{query});
+            lenght = query.length();
+            if (lenght > columnSize[0]) {
+                columnSize[0] = lenght;
+            }
+        }
+
+        if (pageSize == 0) {
+            pageSize = rows.size();
+        }
+
+    }
+
+    private List<String> getColumnList(String sT) {
+        String key = "@Value(";
+        List<String> lst = new <String> ArrayList();
+
+        int iKey = sT.indexOf(key);
+
+        while (iKey != -1) {
+            int iEndKey = sT.indexOf(")", iKey);
+            String column = sT.substring(iKey + 7, iEndKey);
+            lst.add(column);
+            //Verifica se há uma outra coluna.
+            iKey = sT.indexOf(key, iEndKey);
+        }
+
+        return lst;
+    }
+
+    private String normalizeTempate(String scriptTempalte) {
+        return null;
+    }
+
+    private int[] getColumnIndex(List<String> queryRowColumns, List<String> queryColumns) {
+        int[] indexs = new int[queryColumns.size()];
+        for (int i = 0; i < queryColumns.size(); i++) {
+            String col = queryColumns.get(i);
+            indexs[i] = queryRowColumns.indexOf(col);
+        }
+        return indexs;
     }
 }

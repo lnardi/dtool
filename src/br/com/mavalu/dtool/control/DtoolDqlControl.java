@@ -14,6 +14,7 @@ import br.com.mavalu.useful.LoginTableModel;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import javax.swing.JTextArea;
 import javax.swing.table.TableColumn;
 
 /**
@@ -22,113 +23,144 @@ import javax.swing.table.TableColumn;
  */
 public class DtoolDqlControl {
 
-   public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited, int dateFormat) throws DfException {
+    public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited, int dateFormat) throws DfException {
 
-      DtoolLogControl.log("Executando query : " + q, Level.INFO);
+        DtoolLogControl.log("Executando query : \n" + q, Level.INFO);
 
-      IDfCollection col = null;
-      long startTime = System.currentTimeMillis();
-      try {
-         //Remove qualquer quebra de linha na query         
-         col = DocumentumUseful.executarQuery(q.replaceAll("\\r|\\n", " "), 0, top);
-         if (pg.equals("NO")) {
-            pg = "0";
-         }
+        IDfCollection col = null;
+        long startTime = System.currentTimeMillis();
+        try {
+            //Remove qualquer quebra de linha na query         
+            col = DocumentumUseful.executarQuery(q.replaceAll("\\r|\\n", " "), 0, top);
+            if (pg.equals("NO")) {
+                pg = "0";
+            }
 
-         LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg), dateFormat);
-         TableColumn column = null;
+            LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg), dateFormat);
+            TableColumn column = null;
 
-         jTable1.setModel(queryTM);
+            jTable1.setModel(queryTM);
 
-         int size[] = queryTM.getColumnSize();
-         int columns = queryTM.getColumnCount();
+            int size[] = queryTM.getColumnSize();
+            int columns = queryTM.getColumnCount();
 
-         for (int i = 0; i < columns; i++) {
-            column = jTable1.getColumnModel().getColumn(i);
-            column.setPreferredWidth(size[i] * 7);
-         }
+            for (int i = 0; i < columns; i++) {
+                column = jTable1.getColumnModel().getColumn(i);
+                column.setPreferredWidth(size[i] * 7);
+            }
 
-         // jLabel8.setText(String.valueOf(queryTM.getRowCount()));
-         jTable1.repaint();
+            // jLabel8.setText(String.valueOf(queryTM.getRowCount()));
+            jTable1.repaint();
 
-         //Insere a query na lista de queries
-         DtoolQueryControl.storeQuery(q);
-         DtoolLogControl.log("Query excutada com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
-         if (queryTM.getRowCount() == 0) {
-            DtoolLogControl.log("NEHUM REGISTRO ENCONTRADO <==", Level.INFO);
-         }
+            //Insere a query na lista de queries
+            DtoolQueryControl.storeQuery(q);
+            DtoolLogControl.log("Query excutada com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
+            if (queryTM.getRowCount() == 0) {
+                DtoolLogControl.log("NEHUM REGISTRO ENCONTRADO <==", Level.INFO);
+            }
 
-      } catch (DfException ex) {
-         DtoolLogControl.log(ex, Level.SEVERE);
-         DtoolLogControl.log("Query executada com erro - Tempo: " + (System.currentTimeMillis() - startTime) / 1000 + " Segundos", Level.SEVERE);
-      } finally {
-         if (col != null) {
-            DocumentumUseful.close(col);
-         }
-      }
+        } catch (DfException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+            DtoolLogControl.log("Query executada com erro - Tempo: " + (System.currentTimeMillis() - startTime) / 1000 + " Segundos", Level.SEVERE);
+        } finally {
+            if (col != null) {
+                DocumentumUseful.close(col);
+            }
+        }
 
-   }
+    }
 
-   public static String apiexec(String q) {
+    public static String apiexec(String q) {
 
-      try {
-         DtoolLogControl.log("Dumping ID: " + q, Level.INFO);
+        try {
+            DtoolLogControl.log("Dumping ID: " + q, Level.INFO);
 
-         return DocumentumUseful.apiExec(q);
-      } catch (DfException ex) {
-         DtoolLogControl.log(ex, Level.SEVERE);
-      }
+            return DocumentumUseful.apiExec(q);
+        } catch (DfException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+        }
 
-      return null;
+        return null;
 
-   }
+    }
 
-   
-   public static boolean validID(String id ){
-      return DocumentumUseful.validId(id);
-   }
-   
-   
-   /**
-    * Executa o processo de exportação e retorna true se ok
-    * @param id
-    * @return
-    */
-   public static boolean getContent(String id) {
+    public static boolean validID(String id) {
+        return DocumentumUseful.validId(id);
+    }
 
-      boolean exportOK = true;
-      try {
+    /**
+     * Executa o processo de exportação e retorna true se ok
+     *
+     * @param id
+     * @return
+     */
+    public static boolean getContent(String id) {
 
-         if (DocumentumUseful.validId(id)) {
+        boolean exportOK = true;
+        try {
 
-            String path = DocumentumUseful.exportDocument(".\\tmp", id);
+            if (DocumentumUseful.validId(id)) {
 
-            DtoolLogControl.log("Documento (" + id + ") baixado em => \"" + path + "\"", Level.INFO);
+                String path = DocumentumUseful.exportDocument(".\\tmp", id);
 
-            File file = new File(path);
+                DtoolLogControl.log("Documento (" + id + ") baixado em => \"" + path + "\"", Level.INFO);
 
-            Desktop.getDesktop().open(file);
+                File file = new File(path);
 
-         } else {
+                Desktop.getDesktop().open(file);
+
+            } else {
+                DtoolLogControl.log("O valor selecionado não é o ID de um documento => \"" + id + "\"", Level.INFO);
+                exportOK = false;
+            }
+        } catch (DfException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+            exportOK = false;
+        } catch (IOException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+            exportOK = false;
+        } catch (Exception ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
             DtoolLogControl.log("O valor selecionado não é o ID de um documento => \"" + id + "\"", Level.INFO);
             exportOK = false;
-         }
-      } catch (DfException ex) {
-         DtoolLogControl.log(ex, Level.SEVERE);
-         exportOK = false;
-      } catch (IOException ex) {
-         DtoolLogControl.log(ex, Level.SEVERE);
-         exportOK = false;
-      } catch (Exception ex) {
-         DtoolLogControl.log(ex, Level.SEVERE);
-         DtoolLogControl.log("O valor selecionado não é o ID de um documento => \"" + id + "\"", Level.INFO);
-         exportOK = false;
-      }
-      return exportOK;
-   }
+        }
+        return exportOK;
+    }
 
-    public static void executeScript(String text, boolean jTextArea2Edited) {
+    public static void executeScript(String text, boolean jTextArea2Edited, JTable jTable) {
         //Executa uma query em todos os registros listados no grid
+    }
+
+    public static void executeScriptTemplate(LoginTableModel queryTableModel, JTable jTable1, String scriptTempalte, int dateFormat, String pg) {
+        
+        LoginTableModel scriptTM = new LoginTableModel(dateFormat);
+
+        if (pg.equals("NO")) {
+            pg = "0";
+        }
+        scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte.replaceAll("\\r|\\n", " "));
+
+        scriptTM.setPageSize(Integer.parseInt(pg));
+
+        TableColumn column = null;
+
+        jTable1.setModel(scriptTM);
+
+        int size[] = scriptTM.getColumnSize();
+        int columns = scriptTM.getColumnCount();
+
+        for (int i = 0; i < columns; i++) {
+            column = jTable1.getColumnModel().getColumn(i);
+            column.setPreferredWidth(size[i] * 7);
+        }
+
+        DtoolQueryControl.storeQuery(scriptTempalte, true);
+
+        jTable1.repaint();
+    }
+
+    public static void executeScript(JTable jTable1, JTextArea jTextArea2) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

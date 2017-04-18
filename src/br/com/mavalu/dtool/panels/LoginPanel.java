@@ -432,10 +432,9 @@ public class LoginPanel extends javax.swing.JPanel {
      * @param op - Operação: SERVER_CONNECTION = 0; LOGIN = 1; LOGIN_CREDENTIALS
      * = 2; PROGRESS_BAR = 3; DUMP = 4;
      * @param status Flag que seta o status nos componentes;
-     * @param list Array de String com valores que devem ser tratados em cada
-     * status. Não é feito um controle de tamaho
+     * @param obj Qualquer objeto com status, informações para processamento.
      */
-    public void operationControl(int op, boolean status, String[] list) {
+    public void operationControl(int op, boolean status, Object obj) {
         switch (op) {
             case DtoolJFrame.OP_SERVER_CONNECTION:
                 jButton3.setEnabled(status);

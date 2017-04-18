@@ -42,13 +42,10 @@ public class DtoolExportControl {
      * @param rowsList Lista de linhas retornada pela query
      * @param columnsList Lista de colunas retornada pela query
      * @param exportContent Se True, esportar o conteúdo
-     * @param expAllInFolderOrLikeServer Se exportContent for true, e este
-     * parametro também for True o conteúdo deve ser importado dentro de um
-     * folder. Se false, o conteúdo deve ser expotado na mesma extrutura do
-     * servidor.
-     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false,
-     * especifica qual das possíveis extruturas deve ser exportada. Caso a
-     * estrutura excolhida não exista, exportara a extrutura
+     * @param expAllInFolderOrLikeServer Se exportContent for true, e este parametro também for True o conteúdo deve ser importado dentro de um folder. Se
+     * false, o conteúdo deve ser expotado na mesma extrutura do servidor.
+     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
+     * não exista, exportara a extrutura
      */
     public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath, boolean breakCSVByIchronicleid) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
@@ -243,15 +240,12 @@ public class DtoolExportControl {
      * @param rowsList Lista de linhas retornada pela query
      * @param columnsList Lista de colunas retornada pela query
      * @param exportContent Se True, esportar o conteúdo
-     * @param expAllInFolderOrLikeServer Se exportContent for true, e este
-     * parametro também for True o conteúdo deve ser importado dentro de um
-     * folder. Se false, o conteúdo deve ser expotado na mesma extrutura do
-     * servidor.
-     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false,
-     * especifica qual das possíveis extruturas deve ser exportada. Caso a
-     * estrutura excolhida não exista, exportara a extrutura
+     * @param expAllInFolderOrLikeServer Se exportContent for true, e este parametro também for True o conteúdo deve ser importado dentro de um folder. Se
+     * false, o conteúdo deve ser expotado na mesma extrutura do servidor.
+     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
+     * não exista, exportara a extrutura
      */
-    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         if (exportContent) {
             DtoolLogControl.log("Iniciando processo de Exportação (COM CONTEÚDO)", Level.INFO);
@@ -261,7 +255,9 @@ public class DtoolExportControl {
 
         String columnR_id = "r_object_id";
         String columnName = "object_name";
+        String columnI_chronicle_id = "i_chronicle_id";
         int columnR_idFound = -1;
+        int columnI_chronicle_idFound = -1;
         boolean columnNameFound = false;
 
         String line = "Item";
@@ -280,14 +276,22 @@ public class DtoolExportControl {
             if (value.equals(columnName)) {
                 columnNameFound = true;
             }
+            //Valida se as colunas estão presentes
+            if (value.equals(columnI_chronicle_id)) {
+                columnI_chronicle_idFound = i;//Utilizo a posição para pegar o valor depois na linha;
+            }
+
         }
 
         if (!columnNameFound || columnR_idFound < 0) {
             throw new Exception("Para exportação do conteúdo, a query deve retornar os campos Object_name e r_object_id");
         }
+        if (p_breakCSVByIchronicleid && columnI_chronicle_idFound < 0) {
+            throw new Exception("Para exportação quebrando CSV por I_chronicle_id a coluna deve existir");
+        }
         if (p_exportServerPath) {
             header += ";server_path";
-        } else {        
+        } else {
             header += ";file_path;error";
         }
 
@@ -295,7 +299,67 @@ public class DtoolExportControl {
 
         // Chamdo o 
         //public ExportControl(Iterator p_inputsLines, String p_path, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID) throws IOException, DfException {
-        return new ExportControl(rows, rowsList.size(), csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder, p_exportPath, p_numberOfThreads, p_exportServerPath);
+        return new ExportControl(rows, rowsList.size(), csvFile, header, dctmFolderExtruture, expAllInFolderOrLikeServer, columnR_idFound, breakCSV, dtoolJFrame, expFolder, p_exportPath, p_numberOfThreads, p_exportServerPath, p_breakCSVByIchronicleid, columnI_chronicle_idFound);
+
+    }
+
+    public static void exportScriptGrid(String csvFile, List<String[]> rowsList, boolean isDQL, DtoolJFrame dtoolJFrame, long breakCSV) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+        long startTime = System.currentTimeMillis();
+
+        Iterator<String[]> rows = rowsList.iterator();
+        String[] row = null;
+
+        long item = 0; //Númera as lihas exportadas         
+        String afterDot = null;
+        String beforeDot = null;
+        String finalName = null;
+        int fileNumber = 1;
+        afterDot = csvFile.substring(csvFile.length() - 4);
+        beforeDot = csvFile.substring(0, csvFile.length() - 4);
+        if (breakCSV > 0) {
+            finalName = beforeDot + "_" + fileNumber + afterDot;
+        } else {
+            finalName = csvFile;
+        }
+
+        File fileOutput = new File(finalName);
+
+        BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+
+        while (rows.hasNext()) {
+
+            row = rows.next();
+
+            //Gera um novo arquivo se o usuário solicitou quebra e se é para quebrar por chronicle_id
+            if (rows.hasNext() && breakCSV > 0 && item != 0 && ((item % breakCSV) == 0)) {
+
+                csv.flush();
+                csv.close();
+                //Cria o próximo arquivo
+                fileNumber++;
+                finalName = beforeDot + "_" + fileNumber + afterDot;
+                fileOutput = new File(finalName);
+                csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                //Insere o cabeçalho na próxima planilha                
+                csv.newLine();
+            }
+
+            ++item;
+
+            csv.write(row[0]);
+            csv.newLine();
+            if (isDQL) {
+                csv.write("GO");
+                csv.newLine();
+            }
+
+        }
+        csv.flush();
+
+        csv.close();
+
+        DtoolLogControl.log(
+                "Processo de Exportação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
 
     }
 

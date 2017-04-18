@@ -296,7 +296,7 @@ public class DumpPanel extends javax.swing.JPanel {
      * @param list Array de String com valores que devem ser tratados em cada
      * status. Não é feito um controle de tamaho
      */
-    public void operationControl(int op, boolean status, String[] list) {
+    public void operationControl(int op, boolean status, Object obj) {
         switch (op) {
             case DtoolJFrame.OP_SERVER_CONNECTION: //Login
                 jButton5.setEnabled(false);
@@ -307,6 +307,7 @@ public class DumpPanel extends javax.swing.JPanel {
                 jButton6.setEnabled(status);
                 break;
             case DtoolJFrame.OP_DUMP: //dump
+                String[] list = (String[]) obj;
                 if (status) {
                     dumpEvent(list[0]);
                 }

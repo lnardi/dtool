@@ -12,3 +12,7 @@ dtools.0.log
 documentum/local/
 dtools.*.log*
 derby.properties
+tmp/
+documentum/documentum.ini
+*.csv
+*.dql

@@ -72,6 +72,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jButton7 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jButton12 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
@@ -217,6 +218,14 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton14.setText("Gen. Script >>");
+        jButton14.setEnabled(false);
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -228,8 +237,11 @@ public class QueryPanel extends javax.swing.JPanel {
                 .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
                 .addComponent(jButton7)
-                .addGap(6, 6, 6)
-                .addComponent(jButton10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton14)
+                .addGap(71, 71, 71))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -239,7 +251,8 @@ public class QueryPanel extends javax.swing.JPanel {
                     .addComponent(jButton10)
                     .addComponent(jButton7)
                     .addComponent(jButton11)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton14))
                 .addGap(2, 2, 2))
         );
 
@@ -337,8 +350,8 @@ public class QueryPanel extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
+                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -450,10 +463,12 @@ public class QueryPanel extends javax.swing.JPanel {
         jButton9.setEnabled(false);
         jButton2.setEnabled(false);
         jButton11.setEnabled(true);
+        jButton14.setEnabled(false);
         jComboBox2.setEnabled(false);
 
         dtoolJFrame.operationControl(dtoolJFrame.OP_PROGRESS_BAR, true, null);
 
+        queryTableModel = null;        
         jTable1.setModel(new DefaultTableModel());
         jTable1.repaint();
 
@@ -462,12 +477,12 @@ public class QueryPanel extends javax.swing.JPanel {
             protected Object doInBackground() throws Exception {
 
                 if (jTextArea2.getText().indexOf("@Value(") > 0) {
-                    if (queryTableModel.getMaxRowsCount() <= 0) {
+                    if (queryTableModel== null || queryTableModel.getMaxRowsCount() <= 0) {
                         DtoolLogControl.log("Não há linhas para execução deste script", Level.WARNING);
                     } else {
                         DtoolLogControl.log("Esta query será aplicada em cada um das linhas do grid", Level.FINE);
-                        
-                        DtoolDqlControl.executeScript(jTextArea2.getText(), jTextArea2Edited);
+
+                        DtoolDqlControl.executeScript(jTextArea2.getText(), jTextArea2Edited, jTable1);
                     };
 
                 } else {
@@ -496,6 +511,7 @@ public class QueryPanel extends javax.swing.JPanel {
                     jButton9.setEnabled(true);
                     jButton12.setEnabled(true);
                     jButton10.setEnabled(true);
+                    jButton14.setEnabled(true);
 
                 }
                 jButton2.setEnabled(true);
@@ -754,7 +770,6 @@ public class QueryPanel extends javax.swing.JPanel {
                 DtoolLogControl.log("Campo selecionado não é um r_object_id válido para exportação", Level.WARNING);
             }
         } else {
-
             try {
                 exportAllGrid();
             } catch (IOException ex) {
@@ -801,12 +816,54 @@ public class QueryPanel extends javax.swing.JPanel {
 //       ExportToCSV.export(filelocation);
     }//GEN-LAST:event_jButton10ActionPerformed
 
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+
+        DtoolLogControl.log("Gerando Script...............................", Level.WARNING);
+        
+        
+
+        workerQuery = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                if (jTextArea2.getText().indexOf("@Value(") > 0) {
+                    if (queryTableModel== null || queryTableModel.getMaxRowsCount() <= 0) {
+                        DtoolLogControl.log("Não há linhas para execução deste script", Level.WARNING);
+                    } else {                       
+
+                        Object[] list = new Object[2];
+                        list[0] = jTable1.getModel();
+                        list[1] = jTextArea2.getText();
+                        
+                        dtoolJFrame.operationControl(dtoolJFrame.OP_SCRIPT_SHOW, false, list);
+                    };
+
+                } else {
+
+                    DtoolLogControl.log("Query não permite geração de script. Para automatizar a geração de script utilize o coringa \"@Value(<nome da coluna>)\"", Level.WARNING);                    
+                    
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                
+            }
+
+        };
+
+        workerQuery.execute();        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton14ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
@@ -838,9 +895,9 @@ public class QueryPanel extends javax.swing.JPanel {
      *
      * @param op - Operação: SERVER_CONNECTION = 0; LOGIN = 1; LOGIN_CREDENTIALS = 2; PROGRESS_BAR = 3; DUMP = 4;
      * @param status Flag que seta o status nos componentes;
-     * @param list Array de String com valores que devem ser tratados em cada status. Não é feito um controle de tamaho
+     * @param obj Qualquer objeto com status, informações para processamento.
      */
-    public void operationControl(int op, boolean status, String[] list) {
+    public void operationControl(int op, boolean status, Object obj) {
         switch (op) {
             case DtoolJFrame.OP_SERVER_CONNECTION: //Login
                 jButton2.setEnabled(false);
@@ -864,6 +921,7 @@ public class QueryPanel extends javax.swing.JPanel {
                 break;
 
             case DtoolJFrame.OP_SET_QUERY:
+                String[] list = (String[]) obj;
                 jTextArea2.setText(list[0]);
                 break;
 

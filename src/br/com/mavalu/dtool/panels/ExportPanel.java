@@ -478,7 +478,7 @@ public class ExportPanel extends javax.swing.JPanel {
                        long startTime = System.currentTimeMillis();
 
                        ec = DtoolExportControl.exportQueryGridThreads(csvFile,
-                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads, jCheckBox4.isSelected());
+                               loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads, jCheckBox4.isSelected(), jCheckBox5.isSelected());
 
                        ExportThreadPanel etp = new ExportThreadPanel(ec, dtoolJFrame, jDialog);
                        jDialog.setContentPane(etp);
