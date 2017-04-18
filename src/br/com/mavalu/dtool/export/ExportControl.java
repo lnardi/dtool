@@ -47,8 +47,12 @@ public class ExportControl extends Thread {
     private String relatieExportPath = null;
     private int inputLinesSize = 0;
     private boolean exportServerPath = false;
+    private boolean breakCSVByIchronicleid = false;
+    private String lastChronicle_id = null;
+    private int columnI_chronicle_idFound = -1;
+    boolean breakCSVTemp = false;
 
-    public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath) throws IOException, DfException {
+    public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid, int p_columnI_chronicle_idFound) throws IOException, DfException {
 
         inputsLines = p_inputsLines;
         inputLinesSize = p_size;
@@ -60,7 +64,9 @@ public class ExportControl extends Thread {
         breakCSV = p_breakCSV;
         dtoolJFrame = p_dtoolJFrame;
         exportPath = p_exportPath;
-        exportServerPath = p_exportServerPath;//Gera uma coluna com o caminho do arquivo no servidor
+        breakCSVByIchronicleid = p_breakCSVByIchronicleid;
+        columnI_chronicle_idFound = p_columnI_chronicle_idFound;
+        exportServerPath = p_exportServerPath;//Gera uma coluna com o caminho do arquivo no servidor        
         if (p_numberOfThreads >= 1) {
             numberOfThreads = (int) p_numberOfThreads;
         } else {
@@ -152,7 +158,8 @@ public class ExportControl extends Thread {
             String[] row = inputsLines.next();
             tdc.item = ++item;
             tdc.id = row[columnID];
-            tdc.line = String.valueOf(item);//Número da linha
+            tdc.line = String.valueOf(item);//Número da linha                        
+            tdc.chronicle_id = columnI_chronicle_idFound != -1 ? row[columnI_chronicle_idFound] : null;;
             //Copia os valores da linha para gerar o output
             for (int i = 0; i < row.length; i++) {
                 tdc.line += ";" + row[i].replaceAll("\\;|\\r|\\n", " ");
@@ -271,29 +278,38 @@ public class ExportControl extends Thread {
     private void processSucess(TrheadDocPack tdp) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         //SE houver necessidade de quebrar oas arquivos 
         File fileOutput = null;
+
         if (csvOutput == null) {
             fileOutput = new File(getOutputNextFileName());
             csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
             csvOutput.write(header);
             csvOutput.newLine();
-        }
+        }        
 
+        //Se ainda houverem linhas para retornar, cria um novo arquivo
+        if (processedLines.size() > 0 && breakCSV > 0 && (((tdp.item % breakCSV) == 0) || breakCSVTemp)) {
+            if (breakCSVByIchronicleid && tdp.chronicle_id.equals(lastChronicle_id)) {//Finaliza o arquivo atual
+                breakCSVTemp = true;//Verifica novamente na próxima linha
+            } else {
+                //Finaliza o arquivo atual
+                csvOutput.flush();
+                csvOutput.close();
+                //Cria o próximo arquivo
+                fileOutput = new File(getOutputNextFileName());
+                csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                //Insere o cabeçalho na próxima planilha
+                csvOutput.write(header);
+                csvOutput.newLine();
+
+                breakCSVTemp = false; //Retorna ao contador original do break
+            }
+        }        
         //Escreve a linha retornada
         csvOutput.write(tdp.line);
         csvOutput.newLine();
-        //Se ainda houverem linhas para retornar, cria um novo arquivo
-        if (processedLines.size() > 0 && breakCSV > 0 && (tdp.item % breakCSV) == 0) {
-
-            //Finaliza o arquivo atual
-            csvOutput.flush();
-            csvOutput.close();
-            //Cria o próximo arquivo
-            fileOutput = new File(getOutputNextFileName());
-            csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
-            //Insere o cabeçalho na próxima planilha
-            csvOutput.write(header);
-            csvOutput.newLine();
-        }
+        //
+        //Armazena o chronicle ID para verificar dependência
+        lastChronicle_id = tdp.chronicle_id;
     }
 
     private String getOutputNextFileName() {

@@ -17,4 +17,5 @@ package br.com.mavalu.dtool.export;
     public String error = null;
     public boolean processed = false;
     public long size = 0;
+    public String chronicle_id = null;
 }
