@@ -9,6 +9,9 @@ import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
 import com.documentum.fc.common.IDfTime;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,8 +166,6 @@ public class LoginTableModel extends AbstractTableModel {
 
         return (diff > pageSize) ? pageSize : diff;
 
-        // return rows.size();
-        //return pageSize;
     }
 
     public Object getValueAt(int r, int c) {
@@ -199,9 +200,7 @@ public class LoginTableModel extends AbstractTableModel {
     public boolean previousPage() {
 
         boolean canIncrese = page > 1;
-
         page = canIncrese ? --page : page;
-
         return canIncrese;
 
     }
@@ -291,10 +290,6 @@ public class LoginTableModel extends AbstractTableModel {
         return lst;
     }
 
-    private String normalizeTempate(String scriptTempalte) {
-        return null;
-    }
-
     private int[] getColumnIndex(List<String> queryRowColumns, List<String> queryColumns) {
         int[] indexs = new int[queryColumns.size()];
         for (int i = 0; i < queryColumns.size(); i++) {
@@ -303,4 +298,51 @@ public class LoginTableModel extends AbstractTableModel {
         }
         return indexs;
     }
+
+    public void importFile(BufferedReader fileInput, String fieldDelimiter, String columnDelimiter) throws IOException {
+
+        columns = new <String> ArrayList();
+        rows = new <String[]> ArrayList();
+        String attributeName = null;
+        String delimiter = null;
+        String[] row = null;
+
+        //Read columns
+        String line = fileInput.readLine();
+        if (fieldDelimiter != null) {
+            delimiter = columnDelimiter + fieldDelimiter + columnDelimiter;
+        } else {
+            delimiter = fieldDelimiter;
+        }
+
+        String[] clm = line.split(delimiter);
+        //Define o tamanho do grid
+        columnSize = new int[clm.length];
+
+        for (int i = 0; i < clm.length; i++) {
+            if (fieldDelimiter != null) {
+                attributeName = clm[i].replace(fieldDelimiter, "");
+            }
+            columns.add(attributeName);
+            columnSize[i] = attributeName.length();
+        }
+
+        while ((line = fileInput.readLine()) != null) {
+
+            
+            
+            
+                       
+            for (int i = 0; i < clm.length; i++) {
+                if (fieldDelimiter != null) {
+                    attributeName = clm[i].replace(fieldDelimiter, "");
+                }
+                columns.add(attributeName);
+                columnSize[i] = attributeName.length();
+            }
+
+        }
+
+    }
+
 }

@@ -23,7 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author q1D55V6G
  */
-public class ExportQueryPanel extends javax.swing.JPanel {
+public class ExportScriptPanel extends javax.swing.JPanel {
 
     private DtoolJFrame dtoolJFrame;
     private JDialog jDialog;
@@ -38,11 +38,11 @@ public class ExportQueryPanel extends javax.swing.JPanel {
     /**
      * Creates new form ExportPanel
      */
-    public ExportQueryPanel() {
+    public ExportScriptPanel() {
         initComponents();
     }
 
-    ExportQueryPanel(JDialog jd, DtoolJFrame dt, LoginTableModel ltm, String q) throws IOException {
+    ExportScriptPanel(JDialog jd, DtoolJFrame dt, LoginTableModel ltm, String q) throws IOException {
         initComponents();
         jDialog = jd;
         dtoolJFrame = dt;

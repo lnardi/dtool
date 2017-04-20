@@ -73,6 +73,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jButton12 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
@@ -203,7 +204,6 @@ public class QueryPanel extends javax.swing.JPanel {
         });
 
         jButton10.setText("Export");
-        jButton10.setEnabled(false);
         jButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
@@ -226,21 +226,31 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton15.setText("Import");
+        jButton15.setEnabled(false);
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jButton2)
                 .addGap(6, 6, 6)
                 .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
                 .addComponent(jButton7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton10)
                 .addGap(71, 71, 71))
         );
         jPanel9Layout.setVerticalGroup(
@@ -252,7 +262,8 @@ public class QueryPanel extends javax.swing.JPanel {
                     .addComponent(jButton7)
                     .addComponent(jButton11)
                     .addComponent(jButton2)
-                    .addComponent(jButton14))
+                    .addComponent(jButton14)
+                    .addComponent(jButton15))
                 .addGap(2, 2, 2))
         );
 
@@ -350,8 +361,8 @@ public class QueryPanel extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -857,6 +868,10 @@ public class QueryPanel extends javax.swing.JPanel {
         workerQuery.execute();        // TODO add your handling code here:
     }//GEN-LAST:event_jButton14ActionPerformed
 
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton15ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton10;
@@ -864,6 +879,7 @@ public class QueryPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
@@ -942,6 +958,20 @@ public class QueryPanel extends javax.swing.JPanel {
         jDialog2.setLocationByPlatform(true);
 
         jDialog2.setContentPane(exportPanel);
+        //jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        ImageIcon img = new ImageIcon("./img/img (1).png");
+        jDialog2.setIconImage(img.getImage());
+        jDialog2.pack();
+        jDialog2.setVisible(true);
+    }
+    
+    private void importToGrid() throws IOException {
+        ImportPanel importPanel;
+        importPanel = new ImportPanel(jDialog2, dtoolJFrame, (LoginTableModel) jTable1.getModel(), jTextArea2.getText());
+        jDialog2.setLocationRelativeTo(null);
+        jDialog2.setLocationByPlatform(true);
+
+        jDialog2.setContentPane(importPanel);
         //jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ImageIcon img = new ImageIcon("./img/img (1).png");
         jDialog2.setIconImage(img.getImage());

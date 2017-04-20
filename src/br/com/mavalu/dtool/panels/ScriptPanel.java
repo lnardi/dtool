@@ -766,8 +766,8 @@ public class ScriptPanel extends javax.swing.JPanel {
     }
 
     private void exportAllGrid() throws IOException {
-        ExportQueryPanel exportPanel;
-        exportPanel = new ExportQueryPanel(jDialog2, dtoolJFrame, (LoginTableModel) jTable1.getModel(), jTextArea2.getText());
+        ExportScriptPanel exportPanel;
+        exportPanel = new ExportScriptPanel(jDialog2, dtoolJFrame, (LoginTableModel) jTable1.getModel(), jTextArea2.getText());
 
         jDialog2.setLocationRelativeTo(null);
         jDialog2.setLocationByPlatform(true);
