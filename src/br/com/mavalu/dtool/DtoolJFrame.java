@@ -13,6 +13,7 @@ import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.dtool.panels.DtoolSplashScreen;
 import br.com.mavalu.dtool.panels.ScriptPanel;
 import br.com.mavalu.useful.DbUseful;
+import br.com.mavalu.useful.LoginTableModel;
 import java.awt.Dimension;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,6 +45,9 @@ public class DtoolJFrame extends javax.swing.JFrame {
     public final static int OP_EXPORT = 7;
     public final static int OP_EXPORT_COUNT = 8;
     public final static int OP_SCRIPT_SHOW = 9;
+    public final static int OP_IMPORT_FILE = 10;    
+    public final static int OP_IMPORT_SCRIPT = 10;    
+    
     public int dateFormat = 0;
 
     private static Logger logger = Logger.getLogger(DtoolJFrame.class.getName());
@@ -224,5 +228,6 @@ public class DtoolJFrame extends javax.swing.JFrame {
    private javax.swing.JSplitPane jSplitPane1;
    private javax.swing.JTabbedPane jTabbedPane1;
    // End of variables declaration//GEN-END:variables
+
 
 }

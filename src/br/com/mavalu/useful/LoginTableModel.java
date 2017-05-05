@@ -47,6 +47,11 @@ public class LoginTableModel extends AbstractTableModel {
         dateFormat = dtFormat;
     }
 
+    public LoginTableModel(int dtFormat, int pgSize) {
+        dateFormat = dtFormat;
+        pageSize = pgSize;
+    }
+
     public LoginTableModel(IDfCollection col, int pg, int dtFormat) throws DfException {
         loadData(col, pg);
         dateFormat = dtFormat;
@@ -183,7 +188,11 @@ public class LoginTableModel extends AbstractTableModel {
     }
 
     public void setPageSize(int ps) {
-        pageSize = ps;
+        if (ps < 1) {
+            pageSize = rows.size();
+        } else {
+            pageSize = ps;
+        }
         page = 1;
     }
 
@@ -237,7 +246,7 @@ public class LoginTableModel extends AbstractTableModel {
         dateFormat = format;
     }
 
-    public void executeScriptTemplate(LoginTableModel queryTableModel, String scriptTemplate) {
+    public void executeScriptTemplate(LoginTableModel queryTableModel, String scriptTemplate) throws Exception {
 
         columns = new <String> ArrayList();
         rows = new <String[]> ArrayList();
@@ -290,16 +299,23 @@ public class LoginTableModel extends AbstractTableModel {
         return lst;
     }
 
-    private int[] getColumnIndex(List<String> queryRowColumns, List<String> queryColumns) {
+    private int[] getColumnIndex(List<String> queryRowColumns, List<String> queryColumns) throws Exception {
         int[] indexs = new int[queryColumns.size()];
+        boolean fail = false;
         for (int i = 0; i < queryColumns.size(); i++) {
             String col = queryColumns.get(i);
             indexs[i] = queryRowColumns.indexOf(col);
+
+            if (indexs[i] < 0) {
+                throw new Exception("Coluna " + col + " não foi encontrada no grid");
+            }
+
         }
+
         return indexs;
     }
 
-    public void importFile(BufferedReader fileInput, String fieldDelimiter, String columnDelimiter) throws IOException {
+    public void importFile(BufferedReader fileInput, String fieldDelimiter, String columnDelimiter, boolean hasColumns) throws IOException {
 
         columns = new <String> ArrayList();
         rows = new <String[]> ArrayList();
@@ -308,39 +324,104 @@ public class LoginTableModel extends AbstractTableModel {
         String[] row = null;
 
         //Read columns
-        String line = fileInput.readLine();
         if (fieldDelimiter != null) {
             delimiter = columnDelimiter + fieldDelimiter + columnDelimiter;
         } else {
-            delimiter = fieldDelimiter;
+            delimiter = columnDelimiter;
         }
 
-        String[] clm = line.split(delimiter);
-        //Define o tamanho do grid
-        columnSize = new int[clm.length];
+        String line = null;
+        line = fileInput.readLine();
+        //        
+        if (hasColumns) {
+            String[] clm = line.split(delimiter);
+            //Define o tamanho do grid
+            columnSize = new int[clm.length];
 
-        for (int i = 0; i < clm.length; i++) {
-            if (fieldDelimiter != null) {
-                attributeName = clm[i].replace(fieldDelimiter, "");
-            }
-            columns.add(attributeName);
-            columnSize[i] = attributeName.length();
-        }
-
-        while ((line = fileInput.readLine()) != null) {
-
-            
-            
-            
-                       
             for (int i = 0; i < clm.length; i++) {
+
                 if (fieldDelimiter != null) {
                     attributeName = clm[i].replace(fieldDelimiter, "");
+                } else {
+                    attributeName = clm[i];
                 }
                 columns.add(attributeName);
                 columnSize[i] = attributeName.length();
             }
+        } else {
+            String[] ln = line.split(delimiter);
+            //Define o tamanho do grid
+            columnSize = new int[ln.length];
+            row = processRow(ln, fieldDelimiter);
+            rows.add(row);
+            populateColumns(ln.length);
+        }
 
+        String value = null;
+        while ((line = fileInput.readLine()) != null) {
+            //
+            String[] ln = line.split(delimiter);
+            row = processRow(ln, fieldDelimiter);
+            rows.add(row);
+        }
+        if (pageSize == 0) {
+            pageSize = rows.size();
+        }
+
+    }
+
+    private String[] processRow(String[] ln, String fieldDelimiter) {
+        String value = null;
+        String[] row = new String[ln.length];
+
+        for (int i = 0; i < ln.length; i++) {
+            if (fieldDelimiter != null) {
+                value = ln[i].replace(fieldDelimiter, "");
+            } else {
+                value = ln[i];
+            }
+            row[i] = value;
+            if (value.length() > columnSize[i]) {
+                columnSize[i] = value.length();
+            }
+        }
+
+        return row;
+    }
+
+    private void populateColumns(int length) {
+        for (int i = 0; i < length; i++) {
+            columns.add("");
+        }
+    }
+
+    public void importScript(BufferedReader fileInput) throws IOException {
+
+        columns = new <String> ArrayList();
+        rows = new <String[]> ArrayList();
+        String attributeName = null;
+        String delimiter = null;
+        String[] row = null;
+
+        String line = null;
+        line = fileInput.readLine();
+        //        
+        columns.add("Script");
+        columnSize = new int[1];
+        columnSize[0] = line.length();
+        row = new String[1];
+        row[0] = line;
+        rows.add(row);
+
+        String value = null;
+        while ((line = fileInput.readLine()) != null) {
+            //
+            row = new String[1];
+            row[0] = line;
+            rows.add(row);
+        }
+        if (pageSize == 0) {
+            pageSize = rows.size();
         }
 
     }

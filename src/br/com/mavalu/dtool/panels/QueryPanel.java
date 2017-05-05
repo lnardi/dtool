@@ -204,6 +204,7 @@ public class QueryPanel extends javax.swing.JPanel {
         });
 
         jButton10.setText("Export");
+        jButton10.setEnabled(false);
         jButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
@@ -227,7 +228,6 @@ public class QueryPanel extends javax.swing.JPanel {
         });
 
         jButton15.setText("Import");
-        jButton15.setEnabled(false);
         jButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton15ActionPerformed(evt);
@@ -362,7 +362,7 @@ public class QueryPanel extends javax.swing.JPanel {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -420,7 +420,7 @@ public class QueryPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -475,11 +475,12 @@ public class QueryPanel extends javax.swing.JPanel {
         jButton2.setEnabled(false);
         jButton11.setEnabled(true);
         jButton14.setEnabled(false);
+        jButton15.setEnabled(false);
         jComboBox2.setEnabled(false);
 
         dtoolJFrame.operationControl(dtoolJFrame.OP_PROGRESS_BAR, true, null);
 
-        queryTableModel = null;        
+        queryTableModel = null;
         jTable1.setModel(new DefaultTableModel());
         jTable1.repaint();
 
@@ -488,12 +489,12 @@ public class QueryPanel extends javax.swing.JPanel {
             protected Object doInBackground() throws Exception {
 
                 if (jTextArea2.getText().indexOf("@Value(") > 0) {
-                    if (queryTableModel== null || queryTableModel.getMaxRowsCount() <= 0) {
+                    if (queryTableModel == null || queryTableModel.getMaxRowsCount() <= 0) {
                         DtoolLogControl.log("Não há linhas para execução deste script", Level.WARNING);
                     } else {
                         DtoolLogControl.log("Esta query será aplicada em cada um das linhas do grid", Level.FINE);
 
-                        DtoolDqlControl.executeScript(jTextArea2.getText(), jTextArea2Edited, jTable1);
+                        DtoolDqlControl.executeTemplate(jTextArea2.getText(), jTextArea2Edited, jTable1);
                     };
 
                 } else {
@@ -528,6 +529,7 @@ public class QueryPanel extends javax.swing.JPanel {
                 jButton2.setEnabled(true);
                 jButton11.setEnabled(false);
                 jComboBox2.setEnabled(true);
+                jButton15.setEnabled(true);
             }
 
         };
@@ -788,71 +790,32 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         }
         jTable1.clearSelection();
-
-        /**
-         * if (workerExport != null && !workerExport.isDone()) { DtoolLogControl.log("Processo já em execução", Level.WARNING); return; }
-         *
-         * workerExport = new SwingWorker() {
-         *
-         * @Override protected Object doInBackground() throws Exception {
-         *
-         * JFileChooser chooser = new JFileChooser();
-         *
-         * chooser.setCurrentDirectory(new java.io.File(".")); chooser.setDialogTitle("Selecione um arquivo ou crie um novo");
-         * chooser.setFileSelectionMode(JFileChooser.FILES_ONLY); chooser.setAcceptAllFileFilterUsed(false);
-         *
-         * FileFilter filter = new FileNameExtensionFilter("CSV file", new String[]{"csv"}); chooser.setFileFilter(filter);
-         *
-         * chooser.setSelectedFile(new File("Query.csv"));
-         *
-         * if (chooser.showSaveDialog(dtoolJFrame) == JFileChooser.APPROVE_OPTION) { LoginTableModel tm = (LoginTableModel) jTable1.getModel(); try {
-         * DtoolCSVControl.processCSV(chooser.getSelectedFile(), tm.getRows(), tm.getColumns()); } catch (IOException ex) { DtoolLogControl.log(ex,
-         * Level.SEVERE); } DtoolLogControl.log("Query exportada com sucesso em: " + chooser.getSelectedFile(), Level.INFO); } else {
-         *
-         * DtoolLogControl.log("Processo de Exportação falhou ou foi cancelado", Level.INFO);
-         *
-         * }
-         * return null; }
-         *
-         * @Override protected void done() {
-         *
-         * // jButton7.setEnabled(true); }
-         *
-         * };
-         *
-         * workerExport.execute();
-         *
-         * *
-         */
-//       ExportToCSV.export(filelocation);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
 
         DtoolLogControl.log("Gerando Script...............................", Level.WARNING);
-        
-        
 
         workerQuery = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
 
                 if (jTextArea2.getText().indexOf("@Value(") > 0) {
-                    if (queryTableModel== null || queryTableModel.getMaxRowsCount() <= 0) {
+                    if (queryTableModel == null || queryTableModel.getMaxRowsCount() <= 0) {
                         DtoolLogControl.log("Não há linhas para execução deste script", Level.WARNING);
-                    } else {                       
+                    } else {
 
                         Object[] list = new Object[2];
                         list[0] = jTable1.getModel();
                         list[1] = jTextArea2.getText();
-                        
+
                         dtoolJFrame.operationControl(dtoolJFrame.OP_SCRIPT_SHOW, false, list);
                     };
 
                 } else {
 
-                    DtoolLogControl.log("Query não permite geração de script. Para automatizar a geração de script utilize o coringa \"@Value(<nome da coluna>)\"", Level.WARNING);                    
-                    
+                    DtoolLogControl.log("Query não permite geração de script. Para automatizar a geração de script utilize o coringa \"@Value(<nome da coluna>)\"", Level.WARNING);
+
                 }
 
                 return null;
@@ -860,7 +823,7 @@ public class QueryPanel extends javax.swing.JPanel {
 
             @Override
             protected void done() {
-                
+
             }
 
         };
@@ -869,7 +832,13 @@ public class QueryPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-        // TODO add your handling code here:
+        DtoolLogControl.log("Importando registros!!", Level.WARNING);
+        try {
+            importToGrid();
+        } catch (IOException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+        }
+
     }//GEN-LAST:event_jButton15ActionPerformed
 
 
@@ -948,6 +917,14 @@ public class QueryPanel extends javax.swing.JPanel {
                 jButton7.setEnabled(status);
                 jButton10.setEnabled(status);
                 break;
+            case DtoolJFrame.OP_IMPORT_FILE:
+                queryTableModel = (LoginTableModel) obj;
+                jButton14.setEnabled(true);
+                String maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
+                dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
+                jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
+                jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
+                break;
         }
     }
 
@@ -964,10 +941,10 @@ public class QueryPanel extends javax.swing.JPanel {
         jDialog2.pack();
         jDialog2.setVisible(true);
     }
-    
+
     private void importToGrid() throws IOException {
         ImportPanel importPanel;
-        importPanel = new ImportPanel(jDialog2, dtoolJFrame, (LoginTableModel) jTable1.getModel(), jTextArea2.getText());
+        importPanel = new ImportPanel(jDialog2, dtoolJFrame, jTable1, (String) jComboBox2.getSelectedItem(), false);
         jDialog2.setLocationRelativeTo(null);
         jDialog2.setLocationByPlatform(true);
 
@@ -977,6 +954,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jDialog2.setIconImage(img.getImage());
         jDialog2.pack();
         jDialog2.setVisible(true);
+
     }
 
 }

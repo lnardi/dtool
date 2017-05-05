@@ -200,6 +200,9 @@ public class DtoolQueryControl {
 
         //hostName = DocumentumUseful.getHostName();
         docbaseName = DocumentumUseful.getDocbase();
+        if (docbaseName == null){
+            docbaseName = "Script";
+        }
 
         query = query.trim();//.replaceAll("(\\r|\\n)", "");
 

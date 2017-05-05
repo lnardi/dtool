@@ -9,13 +9,13 @@ import br.com.mavalu.dtool.DtoolJFrame;
 import br.com.mavalu.dtool.control.DtoolImportControl;
 import br.com.mavalu.dtool.control.DtoolLogControl;
 import br.com.mavalu.dtool.export.ExportControl;
-import br.com.mavalu.useful.LoginTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -28,9 +28,10 @@ public class ImportPanel extends javax.swing.JPanel {
 
     private DtoolJFrame dtoolJFrame;
     private JDialog jDialog;
-    private LoginTableModel loginTableModel;
+    private JTable jTable;
     private String csvFile;
-    private String query;
+    private String pgSize;
+    private boolean loadScript = false;
     private static String path = null;
     private DtoolImportControl importControl = null;
     private static String file_name = null;
@@ -41,13 +42,22 @@ public class ImportPanel extends javax.swing.JPanel {
     public ImportPanel() {
         initComponents();
     }
-
-    ImportPanel(JDialog jd, DtoolJFrame dt, LoginTableModel ltm, String q) throws IOException {
+    /**
+     * 
+     * @param jd
+     * @param dt
+     * @param jt Tabela que receberá os dados
+     * @param pg
+     * @param ls
+     * @throws IOException 
+     */
+    ImportPanel(JDialog jd, DtoolJFrame dt, JTable jt, String pg, boolean ls) throws IOException {
         initComponents();
         jDialog = jd;
         dtoolJFrame = dt;
-        loginTableModel = ltm;
-        query = q;
+        jTable = jt;
+        pgSize = pg;
+        loadScript = ls;
 
         if (path == null) {
             path = new File(".").getCanonicalPath();
@@ -57,7 +67,7 @@ public class ImportPanel extends javax.swing.JPanel {
         if (file_name != null) {
             jTextField2.setText(file_name);
         }
-
+        jPanel1.setVisible(!loadScript);        
     }
 
     public DtoolImportControl getImportControl() {
@@ -86,6 +96,7 @@ public class ImportPanel extends javax.swing.JPanel {
         jTextField4 = new javax.swing.JTextField();
         jTextField5 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        jCheckBox3 = new javax.swing.JCheckBox();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -168,22 +179,35 @@ public class ImportPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Delimitador de Colunas:");
 
+        jCheckBox3.setText("Primeira linha com cabeçalho");
+        jCheckBox3.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jCheckBox3StateChanged(evt);
+            }
+        });
+        jCheckBox3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jCheckBox2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, 0)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(257, 257, 257))
+                    .addComponent(jCheckBox3)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel3)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jCheckBox2)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,10 +215,13 @@ public class ImportPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox2)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jCheckBox3)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -204,24 +231,27 @@ public class ImportPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addGap(106, 106, 106)
-                        .addComponent(jButton3)
-                        .addGap(53, 53, 53))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(jLabel1)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jButton1))
-                                .addComponent(jLabel2))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                                .addComponent(jTextField1)))))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jButton4)
+                                .addGap(106, 106, 106)
+                                .addComponent(jButton3)
+                                .addGap(53, 53, 53))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jButton1))
+                                    .addComponent(jLabel2))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                                    .addComponent(jTextField1))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -236,8 +266,8 @@ public class ImportPanel extends javax.swing.JPanel {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
                     .addComponent(jButton4))
@@ -250,13 +280,12 @@ public class ImportPanel extends javax.swing.JPanel {
        JFileChooser chooser = new JFileChooser();
 
        chooser.setCurrentDirectory(new java.io.File(jTextField1.getText()));
-       chooser.setDialogTitle("Selecione um arquivo ou crie um novo ");
+       chooser.setDialogTitle("Selecione um arquivo");
        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
        chooser.setAcceptAllFileFilterUsed(false);
 
-       FileFilter filter = new FileNameExtensionFilter("CSV file", new String[]{"csv"});
-       chooser.setFileFilter(filter);
-
+       // FileFilter filter = new FileNameExtensionFilter("CSV file", new String[]{"csv"});
+       //  chooser.setFileFilter(filter);
        chooser.setSelectedFile(new File(jTextField2.getText()));
 
        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -292,7 +321,7 @@ public class ImportPanel extends javax.swing.JPanel {
            protected Object doInBackground() throws Exception {
 
                try {
-                   
+
                    long startTime = System.currentTimeMillis();
 
                    dtoolJFrame.operationControl(dtoolJFrame.OP_PROGRESS_BAR, true, null);
@@ -308,8 +337,10 @@ public class ImportPanel extends javax.swing.JPanel {
                                "Erro",
                                JOptionPane.YES_OPTION);
                    } else {
-
-                       DtoolImportControl.ImportToGrid(fileImput, loginTableModel, dtoolJFrame, (jCheckBox2.isSelected() ? jTextField4.getText() : null), jTextField5.getText());
+                       if (pgSize.equals("NO")) {
+                           pgSize = "0";
+                       }
+                       DtoolImportControl.ImportToGrid(fileImput, jTable, dtoolJFrame, (jCheckBox2.isSelected() ? jTextField4.getText() : null), jTextField5.getText(), jCheckBox3.isSelected(), Integer.parseInt(pgSize), loadScript);
 
                        DtoolLogControl.log("Processo de Importação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
 
@@ -357,6 +388,21 @@ public class ImportPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField5ActionPerformed
 
+    private void jCheckBox3StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBox3StateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox3StateChanged
+
+    private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox3ActionPerformed
+
+    
+    public void setImportScriptOption(){
+       
+        jPanel1.setVisible(false);
+    
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -365,6 +411,7 @@ public class ImportPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -375,3 +422,4 @@ public class ImportPanel extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField5;
     // End of variables declaration//GEN-END:variables
 }
+

@@ -284,7 +284,7 @@
         <Component class="javax.swing.JSpinner" name="jSpinner1">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="10000" maximum="1000000" minimum="1" numberType="java.lang.Long" stepSize="1000" type="number"/>
+              <SpinnerModel initial="20000" maximum="1000000" minimum="1" numberType="java.lang.Long" stepSize="1000" type="number"/>
             </Property>
           </Properties>
         </Component>

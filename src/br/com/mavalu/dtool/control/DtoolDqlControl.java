@@ -14,6 +14,7 @@ import br.com.mavalu.useful.LoginTableModel;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 import javax.swing.JTextArea;
 import javax.swing.table.TableColumn;
 
@@ -127,39 +128,45 @@ public class DtoolDqlControl {
         return exportOK;
     }
 
-    public static void executeScript(String text, boolean jTextArea2Edited, JTable jTable) {
-        //Executa uma query em todos os registros listados no grid
-    }
-
     public static void executeScriptTemplate(LoginTableModel queryTableModel, JTable jTable1, String scriptTempalte, int dateFormat, String pg) {
-        
+
         LoginTableModel scriptTM = new LoginTableModel(dateFormat);
 
         if (pg.equals("NO")) {
             pg = "0";
         }
-        scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte.replaceAll("\\r|\\n", " "));
 
-        scriptTM.setPageSize(Integer.parseInt(pg));
+        try {
+            scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte.replaceAll("\\r|\\n", " "));
 
-        TableColumn column = null;
+            scriptTM.setPageSize(Integer.parseInt(pg));
 
-        jTable1.setModel(scriptTM);
+            TableColumn column = null;
 
-        int size[] = scriptTM.getColumnSize();
-        int columns = scriptTM.getColumnCount();
+            jTable1.setModel(scriptTM);
 
-        for (int i = 0; i < columns; i++) {
-            column = jTable1.getColumnModel().getColumn(i);
-            column.setPreferredWidth(size[i] * 7);
+            int size[] = scriptTM.getColumnSize();
+            int columns = scriptTM.getColumnCount();
+
+            for (int i = 0; i < columns; i++) {
+                column = jTable1.getColumnModel().getColumn(i);
+                column.setPreferredWidth(size[i] * 7);
+            }
+
+            DtoolQueryControl.storeQuery(scriptTempalte, true);
+
+            jTable1.repaint();
+        } catch (Exception ex) {
+            DtoolLogControl.log(ex, Level.INFO);
         }
 
-        DtoolQueryControl.storeQuery(scriptTempalte, true);
-
-        jTable1.repaint();
     }
 
     public static void executeScript(JTable jTable1, JTextArea jTextArea2) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static void executeTemplate(String text, boolean jTextArea2Edited, JTable jTable1) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

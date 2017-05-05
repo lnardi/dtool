@@ -69,6 +69,7 @@ public class ScriptPanel extends javax.swing.JPanel {
         jButton2 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jButton12 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
@@ -193,6 +194,13 @@ public class ScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton14.setText("Import");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -203,8 +211,10 @@ public class ScriptPanel extends javax.swing.JPanel {
                 .addGap(6, 6, 6)
                 .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton10)
-                .addGap(125, 125, 125))
+                .addGap(81, 81, 81))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,7 +223,8 @@ public class ScriptPanel extends javax.swing.JPanel {
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jButton10)
                     .addComponent(jButton11)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton14))
                 .addGap(2, 2, 2))
         );
 
@@ -312,7 +323,7 @@ public class ScriptPanel extends javax.swing.JPanel {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -432,20 +443,19 @@ public class ScriptPanel extends javax.swing.JPanel {
                 jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 jComboBox2.setSelectedItem("NO");
 
-                DtoolDqlControl.executeScript(jTable1, jTextArea2); 
-                        //Se houver valor no campo, executa query selecionada
-                        // Se não houver, executa todas as queries exibindo a query em execução na tela de execução.
-                        
-                        // Tem que selecionar a linha executada atualmente.
-                        // O cancelar, aborta a execução após a última linha executada
-                        //  DtoolDqlControl.executeQuery(jTextArea2.getText(), jTable1, (String) jComboBox1.getSelectedItem(),
-                        //        (String) jComboBox2.getSelectedItem(), jTextArea2Edited, dtoolJFrame.dateFormat);
-                        //Exibe o número de linhas retornadas
-                        //queryTableModel = (LoginTableModel) jTable1.getModel();
-                        //String maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
-                        //dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
-                        //jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
+                DtoolDqlControl.executeScript(jTable1, jTextArea2);
+                //Se houver valor no campo, executa query selecionada
+                // Se não houver, executa todas as queries exibindo a query em execução na tela de execução.
 
+                // Tem que selecionar a linha executada atualmente.
+                // O cancelar, aborta a execução após a última linha executada
+                //  DtoolDqlControl.executeQuery(jTextArea2.getText(), jTable1, (String) jComboBox1.getSelectedItem(),
+                //        (String) jComboBox2.getSelectedItem(), jTextArea2Edited, dtoolJFrame.dateFormat);
+                //Exibe o número de linhas retornadas
+                //queryTableModel = (LoginTableModel) jTable1.getModel();
+                //String maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
+                //dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
+                //jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 jTextArea2Edited = false;
 
                 return null;
@@ -688,12 +698,22 @@ public class ScriptPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jButton10ActionPerformed
 
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        DtoolLogControl.log("Importando Script!!", Level.WARNING);
+        try {
+            importToGrid();
+        } catch (IOException ex) {
+            DtoolLogControl.log(ex, Level.SEVERE);
+        }
+    }//GEN-LAST:event_jButton14ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
@@ -725,6 +745,7 @@ public class ScriptPanel extends javax.swing.JPanel {
      * @param obj Qualquer objeto com status, informações para processamento.
      */
     public void operationControl(int op, boolean status, Object obj) {
+        String maxRows = null;
         switch (op) {
             case DtoolJFrame.OP_SERVER_CONNECTION: //Login
                 jButton2.setEnabled(false);
@@ -736,7 +757,7 @@ public class ScriptPanel extends javax.swing.JPanel {
                 jButton2.setEnabled(false);
                 jButton8.setEnabled(false);
                 jButton9.setEnabled(false);
-                jComboBox2.setEnabled(false);
+                //jComboBox2.setEnabled(false);
 
                 break;
             case DtoolJFrame.OP_LOGIN: //Login
@@ -748,19 +769,27 @@ public class ScriptPanel extends javax.swing.JPanel {
             /**
              * case DtoolJFrame.OP_EXPORT: jButton2.setEnabled(status); jTextField3.setEditable(status); jComboBox2.setEnabled(status);
              * jButton7.setEnabled(status); jButton10.setEnabled(status); break;
-*
+             *
              */
             case DtoolJFrame.OP_SCRIPT_SHOW:
                 jTextArea2.setText("");
                 Object[] objArray = (Object[]) obj;
                 DtoolDqlControl.executeScriptTemplate((LoginTableModel) objArray[0], jTable1, (String) objArray[1], dtoolJFrame.dateFormat, (String) jComboBox2.getSelectedItem());
                 queryTableModel = (LoginTableModel) jTable1.getModel();
-                String maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
+                maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
                 dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
                 jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 jButton10.setEnabled(true);
                 jButton9.setEnabled(true);
-                jButton12.setEnabled(true);
+                jButton12.setEnabled(true);                
+                break;
+            case DtoolJFrame.OP_IMPORT_SCRIPT:
+                queryTableModel = (LoginTableModel) obj;
+                jButton14.setEnabled(true);
+                maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
+                dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
+                jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
+                jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 break;
         }
     }
@@ -773,6 +802,21 @@ public class ScriptPanel extends javax.swing.JPanel {
         jDialog2.setLocationByPlatform(true);
 
         jDialog2.setContentPane(exportPanel);
+        //jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+        ImageIcon img = new ImageIcon("./img/img (1).png");
+        jDialog2.setIconImage(img.getImage());
+        jDialog2.pack();
+        jDialog2.setVisible(true);
+
+    }
+
+    private void importToGrid() throws IOException {
+        ImportPanel importPanel;
+        importPanel = new ImportPanel(jDialog2, dtoolJFrame, jTable1, (String) jComboBox2.getSelectedItem(), true);
+        jDialog2.setLocationRelativeTo(null);
+        jDialog2.setLocationByPlatform(true);
+
+        jDialog2.setContentPane(importPanel);
         //jDialog2.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ImageIcon img = new ImageIcon("./img/img (1).png");
         jDialog2.setIconImage(img.getImage());
