@@ -325,7 +325,7 @@ public class LoginTableModel extends AbstractTableModel {
 
         //Read columns
         if (fieldDelimiter != null) {
-            delimiter = columnDelimiter + fieldDelimiter + columnDelimiter;
+            delimiter = fieldDelimiter  + columnDelimiter + fieldDelimiter;
         } else {
             delimiter = columnDelimiter;
         }

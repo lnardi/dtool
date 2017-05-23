@@ -5,11 +5,8 @@
         <group>
             <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/panels/QueryPanel.java</file>
             <file>file:/C:/projects/dtool/src/br/com/mavalu/useful/LoginTableModel.java</file>
-            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/control/DtoolQueryControl.java</file>
-            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/panels/ScriptPanel.java</file>
-            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/panels/ExportQueryPanel.java</file>
-            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/panels/QueryList.java</file>
-            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/control/DtoolDqlControl.java</file>
+            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/control/DtoolImportControl.java</file>
+            <file>file:/C:/projects/dtool/src/br/com/mavalu/dtool/panels/ImportPanel.java</file>
         </group>
     </open-files>
 </project-private>

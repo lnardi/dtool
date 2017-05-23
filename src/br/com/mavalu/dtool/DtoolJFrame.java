@@ -85,7 +85,7 @@ public class DtoolJFrame extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(logPanel);
 
-        this.setPreferredSize(new Dimension(879, 604));
+        this.setPreferredSize(new Dimension(1050, 604));
 
         pack();
 
