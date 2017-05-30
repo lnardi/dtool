@@ -65,6 +65,9 @@ public class ExportPanel extends javax.swing.JPanel {
 
         jCheckBox4.setSelected(exportServerPath);
 
+        //Verificar se é necessário selecionar a opção de criar vários arquivos
+        updateSplitFileOption();
+
     }
 
     public ExportControl getExportControl() {
@@ -182,6 +185,11 @@ public class ExportPanel extends javax.swing.JPanel {
         });
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Long.valueOf(20000L), Long.valueOf(1L), Long.valueOf(1000000L), Long.valueOf(1000L)));
+        jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner1StateChanged(evt);
+            }
+        });
 
         jCheckBox1.setText("Exportar conteúdo ( baseado no atributo r_object_id)");
         jCheckBox1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -306,7 +314,7 @@ public class ExportPanel extends javax.swing.JPanel {
 
         jLabel4.setText("Número de Threads: ");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(2, 1, 20, 1));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(4, 1, 20, 1));
         jSpinner2.setEditor(new javax.swing.JSpinner.NumberEditor(jSpinner2, ""));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -481,12 +489,17 @@ public class ExportPanel extends javax.swing.JPanel {
                                loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox3.isSelected(), jTextField3.getText(), numberOfThreads, jCheckBox4.isSelected(), jCheckBox5.isSelected());
 
                        ExportThreadPanel etp = new ExportThreadPanel(ec, dtoolJFrame, jDialog);
+                       etp.startExecution();
                        jDialog.setContentPane(etp);
                        jDialog.pack();
                        jDialog.setVisible(true);
+                       
 
                        DtoolLogControl.log("Processo de Exportação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
 
+                       //Inicia a execução automaticamente;
+                       
+                       
                    } else {
 
                        DtoolExportControl.exportQueryGrid(csvFile,
@@ -573,6 +586,10 @@ public class ExportPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jCheckBox2StateChanged
 
+    private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
+        updateSplitFileOption();
+    }//GEN-LAST:event_jSpinner1StateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -600,4 +617,10 @@ public class ExportPanel extends javax.swing.JPanel {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
+
+    private void updateSplitFileOption() {
+        if (loginTableModel.getRowCount() > ((Long) jSpinner1.getValue())) {
+            jCheckBox2.setSelected(true);
+        }
+    }
 }
