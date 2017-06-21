@@ -21,14 +21,18 @@ public class GenericTest {
       //Pattern PATTERN = Pattern.compile("[^A-Za-z0-9çÇ   ã\t\nÃõÕ_\\-\\.]");
 
       //String a = "::CONCEI?AO DA PAIXAO MACIEL DE SA DOS|| SANTOç:ÇS* - 3484146.pdf -|";
-      String a = "TAÃ??S CA   R\t\nLA MA\\GA//LH>Ã<as;;;s?Æ?E\"S";
+      String a = "[TAÃ??S CA   R\t\nLA MA\\GA//LH>Ã<as;;;s?Æ?E\"S]";
       System.out.println(a);
       // String a = "TAÃiS CARLA MAnGALHÃES";
 
       //System.out.println("String: " + a.replaceAll("[^A-Za-z0-9Ç\\ÃÕÔ//ÁÉÊÛ_\\s_\\-\\.]", "#"));
       //System.out.println("String: " + a.replaceAll("[\\?]", "#"));
-      //System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));
-      System.out.println("String: " + a.replaceAll("\\;|\\r|\\n", "#"));
+      //System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));     
+
+      
+        System.out.println("String: " + a.replaceAll("[\\]\\[\\\"]", ""));
+      
+//      System.out.println("String: " + a.replaceAll("\\;|\\r|\\n", "#"));
 
       
       

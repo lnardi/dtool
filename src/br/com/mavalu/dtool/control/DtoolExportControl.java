@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ public class DtoolExportControl {
      * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
      * não exista, exportara a extrutura
      */
-    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath, boolean breakCSVByIchronicleid) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath, boolean breakCSVByIchronicleid, boolean concatenateIdRepeated, String separationString) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         long startTime = System.currentTimeMillis();
         if (exportContent) {
@@ -72,11 +73,6 @@ public class DtoolExportControl {
         } else {
             finalName = csvFile;
         }
-
-        File fileOutput = new File(finalName);
-        File fileOutputError = new File(finalNameError);
-
-        BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
 
 //new java.io.BufferedWriter(new java.io.FileWriter(file));
         String columnR_id = "r_object_id";
@@ -127,6 +123,17 @@ public class DtoolExportControl {
             header += ";file_path;error";
 
         }
+
+        //Concatena se solicitado pelo usúário.
+        if (concatenateIdRepeated) {
+            rowsList = concatenateIdRepeated(rowsList, separationString, columnR_idFound);
+        }
+
+        //criar os arquivos
+        File fileOutput = new File(finalName);
+        File fileOutputError = new File(finalNameError);
+
+        BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
 
         csv.write(header);
         csv.newLine();
@@ -245,7 +252,7 @@ public class DtoolExportControl {
      * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
      * não exista, exportara a extrutura
      */
-    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
+    public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid, boolean concatenateIdRepeated, String separationString) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
         if (exportContent) {
             DtoolLogControl.log("Iniciando processo de Exportação (COM CONTEÚDO)", Level.INFO);
@@ -280,7 +287,6 @@ public class DtoolExportControl {
             if (value.equals(columnI_chronicle_id)) {
                 columnI_chronicle_idFound = i;//Utilizo a posição para pegar o valor depois na linha;
             }
-
         }
 
         if (!columnNameFound || columnR_idFound < 0) {
@@ -293,6 +299,10 @@ public class DtoolExportControl {
             header += ";server_path";
         } else {
             header += ";file_path;error";
+        }
+        //Concatena se solicitado pelo usúário.
+        if (concatenateIdRepeated) {
+            rowsList = concatenateIdRepeated(rowsList, separationString, columnR_idFound);
         }
 
         Iterator<String[]> rows = rowsList.iterator();
@@ -361,6 +371,45 @@ public class DtoolExportControl {
         DtoolLogControl.log(
                 "Processo de Exportação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
 
+    }
+
+    private static List<String[]> concatenateIdRepeated(List<String[]> rowsList, String separationString, int columnR_idFound) {
+
+        List<String[]> rowsListReturn = new <String[]>ArrayList();
+        String[] row = null;
+        String[] lastRow = null;
+
+        Iterator<String[]> rows = rowsList.iterator();
+        while (rows.hasNext()) {
+
+            row = rows.next();
+            // Só processa a segunda linha    
+            if (lastRow != null) {
+                //Verifica se o r_object_id da linha atual é igual a anterior
+                if (lastRow[columnR_idFound].equals(row[columnR_idFound])) {
+                    //se for, concatena as colunas com valores diferentes;
+                    for (int i = 0; i < row.length; i++) {
+                        if (!row[i].trim().isEmpty() && !lastRow[i].equals(row[i])) {
+                            if (lastRow[i].trim().isEmpty()) {
+                                lastRow[i] = row[i];
+                            } else {
+                                lastRow[i] = lastRow[i] + separationString + row[i];
+                            }
+                        }
+                    }
+                } else {
+                    //Caso contrário, adiciona a última linha processada da lista de retorno e processa a próxima linha;
+                    rowsListReturn.add(lastRow);
+                    lastRow = row;
+                }
+            } else {
+                lastRow = row;
+            }
+        }
+        //Armazena a última linha
+        rowsListReturn.add(lastRow);
+
+        return rowsListReturn;
     }
 
 }

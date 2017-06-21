@@ -160,8 +160,6 @@ public class ImportPanel extends javax.swing.JPanel {
 
         jTextField4.setText("\"");
         jTextField4.setEnabled(false);
-        jTextField4.setFocusable(false);
-        jTextField4.setRequestFocusEnabled(false);
         jTextField4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField4ActionPerformed(evt);
@@ -169,8 +167,6 @@ public class ImportPanel extends javax.swing.JPanel {
         });
 
         jTextField5.setText(";");
-        jTextField5.setFocusable(false);
-        jTextField5.setRequestFocusEnabled(false);
         jTextField5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField5ActionPerformed(evt);
