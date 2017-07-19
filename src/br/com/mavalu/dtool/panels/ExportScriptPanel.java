@@ -23,14 +23,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author q1D55V6G
  */
-public class ExportScriptPanel extends javax.swing.JPanel {
+public class ExportScriptPanel extends DToolJPanel {
 
     private DtoolJFrame dtoolJFrame;
     private JDialog jDialog;
     private LoginTableModel loginTableModel;
     private String csvFile;
-    private String query;
-    private static String path = null;
+    private String query;    
     private ExportControl ec = null;
     private static String file_name = null;
     private static long split_line_number = 0;
@@ -60,8 +59,8 @@ public class ExportScriptPanel extends javax.swing.JPanel {
 
         if (split_line_number != 0) {
             jSpinner1.setValue(split_line_number);
-        }
-
+        }       
+        
     }
 
     public ExportControl getExportControl() {

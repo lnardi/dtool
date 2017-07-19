@@ -46,7 +46,8 @@ public class DtoolJFrame extends javax.swing.JFrame {
     public final static int OP_EXPORT_COUNT = 8;
     public final static int OP_SCRIPT_SHOW = 9;
     public final static int OP_IMPORT_FILE = 10;    
-    public final static int OP_IMPORT_SCRIPT = 10;    
+    public final static int OP_IMPORT_SCRIPT = 10; 
+    public final static int OP_REFRESH_QUERY_RESULT_TABLE = 11;
     
     public int dateFormat = 0;
 

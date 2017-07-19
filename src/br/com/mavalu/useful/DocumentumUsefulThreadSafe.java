@@ -1,7 +1,6 @@
 package br.com.mavalu.useful;
 
 import br.com.mavalu.dtool.export.TrheadDocPack;
-import static br.com.mavalu.useful.DocumentumUseful.getRepsitoryDosFormatFromMimeType;
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.DfQuery;
@@ -41,6 +40,7 @@ public class DocumentumUsefulThreadSafe {
     private final HashMap<String, String> mimeTypeList = new HashMap<String, String>();
     private final HashMap<IDfCollection, IDfSession> sessionList = new HashMap<IDfCollection, IDfSession>();
     private IDfSession localSession = null;
+    private HashMap<String, String> dosTypeList = new HashMap<String, String>();
 
     /**
      * @param q String com a query
@@ -254,18 +254,18 @@ public class DocumentumUsefulThreadSafe {
 
     }
 
-    public String apiExecSize(String q) throws DfException {
+    public String apiExecSize(String id) throws DfException {
 
         IDfSession session = sessionMgr.getSession(loginDocbase);
 
         IDfDocument doc
-                = (IDfDocument) session.getObject(new DfId(q));
+                = (IDfDocument) session.getObject(new DfId(id));
         //VErifica se possui conteúdo.
         if (doc.getContentSize() == 0) {
             return "";
         }
         try {
-            return session.apiGet("getpath", q);
+            return session.apiGet("getpath", id);
         } finally {
             sessionMgr.release(session);
         }
@@ -526,6 +526,44 @@ public class DocumentumUsefulThreadSafe {
         }
 
         return documentPath;
+    }
+    
+    public String getRepsitoryDosFormatFromMimeType(String content_type) throws DfException {
+
+        content_type = content_type.trim();
+
+        String contentType = dosTypeList.get(content_type);
+        if (contentType != null) {
+            return contentType;
+        }
+
+        StringBuffer bufFormatQuery = new StringBuffer(32);
+        bufFormatQuery.append("select dos_extension from dm_format where name = '");
+        bufFormatQuery.append(content_type).append("'");
+        IDfQuery formatQuery = new DfQuery();
+        formatQuery.setDQL(bufFormatQuery.toString());
+
+        IDfCollection formats = null;
+        IDfSession session = sessionMgr.getSession(loginDocbase);
+
+        try {
+
+            formats = formatQuery.execute(session, IDfQuery.READ_QUERY);
+
+            if (formats.next()) {
+                contentType = formats.getString("dos_extension");
+                dosTypeList.put(content_type, contentType);
+                return contentType;
+            } else {
+                return null;
+            }
+        } finally {
+            sessionMgr.release(session);
+            if (formats != null) {
+                formats.close();
+            }
+        }
+
     }
 
 }

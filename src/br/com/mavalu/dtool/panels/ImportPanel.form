@@ -228,6 +228,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBox3">
           <Properties>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Primeira linha com cabe&#xe7;alho"/>
           </Properties>
           <Events>

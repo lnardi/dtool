@@ -312,7 +312,7 @@ public class DocumentumUseful {
      * @param content_type The documentum a_content_type attribute
      * @return The corresponding dos extention.
      */
-    public static String getRepsitoryDosFormatFromMimeType(String content_type) throws DfException {
+    public static synchronized String getRepsitoryDosFormatFromMimeType(String content_type) throws DfException {
 
         content_type = content_type.trim();
 

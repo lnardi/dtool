@@ -468,7 +468,7 @@ public class ScriptPanel extends javax.swing.JPanel {
                 jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 jComboBox2.setSelectedItem("NO");
 
-                DtoolDqlControl.executeScript(jTable1, jTextArea2);
+                DtoolDqlControl.executeScript(jTable1, jTextArea2, jRadioButton2.isSelected());
                 //Se houver valor no campo, executa query selecionada
                 // Se não houver, executa todas as queries exibindo a query em execução na tela de execução.
 

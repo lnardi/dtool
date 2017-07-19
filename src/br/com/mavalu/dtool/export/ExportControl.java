@@ -51,6 +51,8 @@ public class ExportControl extends Thread {
     private String lastChronicle_id = null;
     private int columnI_chronicle_idFound = -1;
     boolean breakCSVTemp = false;
+    private String fileName = "";
+    private boolean hasError = false;//Sinaliza que houve erro durante a exportação do arquivo corrente. 
 
     public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid, int p_columnI_chronicle_idFound) throws IOException, DfException {
 
@@ -177,7 +179,7 @@ public class ExportControl extends Thread {
     public void stopThreads() {
 
         for (DocumentumExportControl i : dIControlTheadList) {
-            i.setStop();
+            i.setStop();            
         }
         //inativa a thread de entrada
         active = false;
@@ -221,6 +223,7 @@ public class ExportControl extends Thread {
 
     @Override
     public void run() {
+        String[] msg = new String[1];
         try {
             while (isActive() || processedLines.size() > 0) {
                 while (processedLines.peek() != null && processedLines.peek().processed) {
@@ -232,9 +235,8 @@ public class ExportControl extends Thread {
                             processError(tdp);
                         }
                     }
-
-                    dtoolJFrame.operationControl(dtoolJFrame.OP_EXPORT_COUNT, false, new String[]{"" + item + " - Erros: " + erros
-                    });
+                    msg[0] = "" + item + " - Erros: " + erros;
+                    dtoolJFrame.operationControl(dtoolJFrame.OP_EXPORT_COUNT, false, msg);
                 }
 
                 //Se estiver em pausa, não possuir mais arquivos aguardando processamento
@@ -280,11 +282,12 @@ public class ExportControl extends Thread {
         File fileOutput = null;
 
         if (csvOutput == null) {
-            fileOutput = new File(getOutputNextFileName());
+            fileName = getOutputNextFileName();
+            fileOutput = new File(fileName);
             csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
             csvOutput.write(header);
             csvOutput.newLine();
-        }        
+        }
 
         //Se ainda houverem linhas para retornar, cria um novo arquivo
         if (processedLines.size() > 0 && breakCSV > 0 && (((tdp.item % breakCSV) == 0) || breakCSVTemp)) {
@@ -295,15 +298,17 @@ public class ExportControl extends Thread {
                 csvOutput.flush();
                 csvOutput.close();
                 //Cria o próximo arquivo
-                fileOutput = new File(getOutputNextFileName());
+                fileName = getOutputNextFileName();
+                fileOutput = new File(fileName);
                 csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
                 //Insere o cabeçalho na próxima planilha
                 csvOutput.write(header);
                 csvOutput.newLine();
 
                 breakCSVTemp = false; //Retorna ao contador original do break
+                hasError = false;//Reseta o flag que sinaliza erros por arquivo
             }
-        }        
+        }
         //Escreve a linha retornada
         csvOutput.write(tdp.line);
         csvOutput.newLine();
@@ -333,6 +338,7 @@ public class ExportControl extends Thread {
     }
 
     private void processError(TrheadDocPack tdp) throws UnsupportedEncodingException, IOException {
+        hasError = true;
         DtoolLogControl.log("Erro da linha: " + tdp.line, Level.WARNING);
         String error = tdp.error.replace(";", "-");
         tdp.line += ";/////////ERROR////////;" + error;
@@ -356,5 +362,13 @@ public class ExportControl extends Thread {
 
     public boolean exportServerPath() {
         return exportServerPath;
+    }
+
+    public String getFileOutputName() {
+        return fileName;
+    }
+    
+    public boolean getHasError(){
+        return hasError;
     }
 }

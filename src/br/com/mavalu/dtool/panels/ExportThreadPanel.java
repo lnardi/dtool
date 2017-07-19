@@ -13,6 +13,7 @@ import br.com.mavalu.dtool.export.ExportControl;
 import br.com.mavalu.useful.LoginTableModel;
 import br.com.mavalu.useful.ThreadTableModel;
 import com.documentum.fc.common.DfException;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -77,6 +78,8 @@ public class ExportThreadPanel extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
@@ -213,6 +216,11 @@ public class ExportThreadPanel extends javax.swing.JPanel {
             }
         });
 
+        jLabel25.setText("Arquivo:");
+
+        jLabel26.setFont(new java.awt.Font("Comic Sans MS", 2, 11)); // NOI18N
+        jLabel26.setText("<output>");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -227,7 +235,11 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel25)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel26)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
@@ -239,7 +251,12 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 .addGap(2, 2, 2)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabel26))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Threads Exportando"));
@@ -441,10 +458,10 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -666,11 +683,11 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 jLabel8.setText(time);
             }
 
-            updateCounters((millis / (1000 * 60)), hour, millis);
+            updateCounters((millis / (1000 * 60)), hour, millis, time);
 
         }
 
-        private void updateCounters(long minute, long hour, long millis) {
+        private void updateCounters(long minute, long hour, long millis, String time) {
 
             boolean threadsStoped = true;//Utilizada para verificar se todas as trheads já finalizaram
 
@@ -682,7 +699,18 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 return;
             }
 
-            List<DocumentumExportControl> list = mc.getDIControlTheadList();
+            String path = mc.getFileOutputName();
+                    
+            path = path.length() < 30 ? path : ("..." + path.substring(path.length() - 30));
+            
+            List<DocumentumExportControl> list = mc.getDIControlTheadList();            
+            if (mc.getHasError()){
+                jLabel26.setText(path + "_<ERROR>_");
+                jLabel26.setForeground(Color.RED);
+            } else {
+                jLabel26.setText(path);
+                jLabel26.setForeground(Color.BLACK);
+            }
 
             int i = 0;
 
@@ -712,8 +740,8 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 i++;
             }
             jTable1.repaint();
-            jTable1.updateUI();
-
+            jTable1.updateUI();            
+                      
             jLabel2.setText(Long.toString(total) + "/" + mc.getInputSize());
             jLabel4.setText(Long.toString(totalHour));
             jLabel6.setText(Long.toString(totalMin));
@@ -735,7 +763,13 @@ public class ExportThreadPanel extends javax.swing.JPanel {
                 jLabel24.setText(humanReadableByteCount(totalSize / hour, true));
             }
             jTextField1.setText(Integer.toString(mc.getWaitingProcessing()));
+            
+            //Se todas as threads finalizaram
             if (threadsStoped) {
+                
+                DtoolLogControl.log("Foram exportados: " + Long.toString(total) + "/" + mc.getInputSize(), Level.WARNING);
+                DtoolLogControl.log("Processo de Exportação finalizado com sucesso - Tempo: " + time, Level.INFO);
+                
                 jButton4.setEnabled(false);//Desabilita o botão de Begin
                 jButton5.setText("SAIR");//Desabilita o botão de Begin 
                 verificarSair();
@@ -807,6 +841,8 @@ public class ExportThreadPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

@@ -24,8 +24,11 @@ import javax.swing.table.AbstractTableModel;
 public class LoginTableModel extends AbstractTableModel {
 
     private static int dateFormat = 0;
-
     private List<String> columns;
+    private List<String[]> rows;
+    private int columnSize[] = null;
+    private int page = 1;
+    private int pageSize = 10;
 
     public List<String> getColumns() {
         return columns;
@@ -34,10 +37,6 @@ public class LoginTableModel extends AbstractTableModel {
     public List<String[]> getRows() {
         return rows;
     }
-    private List<String[]> rows;
-    private int columnSize[] = null;
-    private int page = 1;
-    private int pageSize = 10;
 
     public int[] getColumnSize() {
         return columnSize;
@@ -267,7 +266,7 @@ public class LoginTableModel extends AbstractTableModel {
         for (String[] queryRow : queryRows) {
             query = scriptTemplate;
             for (int i = 0; i < columIndex.length; i++) {
-                query = query.replace(key + queryColumns.get(i) + ")", queryRow[columIndex[i]]);
+                query = query.replace(key + queryColumns.get(i) + ")", (queryRow[columIndex[i]] == null ? "null" : queryRow[columIndex[i]]));
             }
             rows.add(new String[]{query});
             lenght = query.length();
@@ -325,7 +324,7 @@ public class LoginTableModel extends AbstractTableModel {
 
         //Read columns
         if (fieldDelimiter != null) {
-            delimiter = fieldDelimiter  + columnDelimiter + fieldDelimiter;
+            delimiter = fieldDelimiter + columnDelimiter + fieldDelimiter;
         } else {
             delimiter = columnDelimiter;
         }
@@ -350,11 +349,14 @@ public class LoginTableModel extends AbstractTableModel {
             }
         } else {
             String[] ln = line.split(delimiter);
+            //Criar colunas genericas
+            for (int i = 0; i < ln.length; i++) {
+                columns.add("<COLUMN_" + i + ">");
+            }
             //Define o tamanho do grid
             columnSize = new int[ln.length];
             row = processRow(ln, fieldDelimiter);
             rows.add(row);
-            populateColumns(ln.length);
         }
 
         String value = null;
@@ -372,7 +374,8 @@ public class LoginTableModel extends AbstractTableModel {
 
     private String[] processRow(String[] ln, String fieldDelimiter) {
         String value = null;
-        String[] row = new String[ln.length];
+        //String[] row = new String[ln.length];
+        String[] row = new String[columns.size()];
 
         for (int i = 0; i < ln.length; i++) {
             if (fieldDelimiter != null) {
@@ -387,12 +390,6 @@ public class LoginTableModel extends AbstractTableModel {
         }
 
         return row;
-    }
-
-    private void populateColumns(int length) {
-        for (int i = 0; i < length; i++) {
-            columns.add("");
-        }
     }
 
     public void importScript(BufferedReader fileInput) throws IOException {
@@ -426,4 +423,10 @@ public class LoginTableModel extends AbstractTableModel {
 
     }
 
+    public void reset() {
+
+        columns = new <String> ArrayList();
+        rows = new <String[]> ArrayList();
+        pageSize = 0;
+    }
 }

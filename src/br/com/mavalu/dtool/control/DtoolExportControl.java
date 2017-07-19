@@ -43,10 +43,13 @@ public class DtoolExportControl {
      * @param rowsList Lista de linhas retornada pela query
      * @param columnsList Lista de colunas retornada pela query
      * @param exportContent Se True, esportar o conteúdo
-     * @param expAllInFolderOrLikeServer Se exportContent for true, e este parametro também for True o conteúdo deve ser importado dentro de um folder. Se
-     * false, o conteúdo deve ser expotado na mesma extrutura do servidor.
-     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
-     * não exista, exportara a extrutura
+     * @param expAllInFolderOrLikeServer Se exportContent for true, e este
+     * parametro também for True o conteúdo deve ser importado dentro de um
+     * folder. Se false, o conteúdo deve ser expotado na mesma extrutura do
+     * servidor.
+     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false,
+     * especifica qual das possíveis extruturas deve ser exportada. Caso a
+     * estrutura excolhida não exista, exportara a extrutura
      */
     public static void exportQueryGrid(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean exportServerPath, boolean breakCSVByIchronicleid, boolean concatenateIdRepeated, String separationString) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
@@ -117,11 +120,11 @@ public class DtoolExportControl {
             if (!columnNameFound || columnR_idFound < 0) {
                 throw new Exception("Para exportação do conteúdo, a query deve retornar os campos Object_name e r_object_id");
             }
-            if (breakCSVByIchronicleid && columnI_chronicle_idFound < 0) {
-                throw new Exception("Para exportação quebrando CSV por I_chronicle_id a coluna deve existir");
-            }
             header += ";file_path;error";
+        }
 
+        if (breakCSVByIchronicleid && columnI_chronicle_idFound < 0) {
+            throw new Exception("Para exportação quebrando CSV por I_chronicle_id a coluna deve existir");
         }
 
         //Concatena se solicitado pelo usúário.
@@ -247,10 +250,13 @@ public class DtoolExportControl {
      * @param rowsList Lista de linhas retornada pela query
      * @param columnsList Lista de colunas retornada pela query
      * @param exportContent Se True, esportar o conteúdo
-     * @param expAllInFolderOrLikeServer Se exportContent for true, e este parametro também for True o conteúdo deve ser importado dentro de um folder. Se
-     * false, o conteúdo deve ser expotado na mesma extrutura do servidor.
-     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false, especifica qual das possíveis extruturas deve ser exportada. Caso a estrutura excolhida
-     * não exista, exportara a extrutura
+     * @param expAllInFolderOrLikeServer Se exportContent for true, e este
+     * parametro também for True o conteúdo deve ser importado dentro de um
+     * folder. Se false, o conteúdo deve ser expotado na mesma extrutura do
+     * servidor.
+     * @param dctmFolderExtruture Se expAllInFolderOrLikeServer é false,
+     * especifica qual das possíveis extruturas deve ser exportada. Caso a
+     * estrutura excolhida não exista, exportara a extrutura
      */
     public static ExportControl exportQueryGridThreads(String csvFile, List<String[]> rowsList, List<String> columnsList, boolean exportContent, boolean expAllInFolderOrLikeServer, int dctmFolderExtruture, DtoolJFrame dtoolJFrame, long breakCSV, boolean expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid, boolean concatenateIdRepeated, String separationString) throws FileNotFoundException, UnsupportedEncodingException, IOException, Exception {
 
@@ -303,6 +309,7 @@ public class DtoolExportControl {
         //Concatena se solicitado pelo usúário.
         if (concatenateIdRepeated) {
             rowsList = concatenateIdRepeated(rowsList, separationString, columnR_idFound);
+            
         }
 
         Iterator<String[]> rows = rowsList.iterator();

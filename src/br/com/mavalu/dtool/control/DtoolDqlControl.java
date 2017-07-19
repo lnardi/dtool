@@ -14,8 +14,10 @@ import br.com.mavalu.useful.LoginTableModel;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 /**
@@ -137,6 +139,10 @@ public class DtoolDqlControl {
         }
 
         try {
+            
+            jTable1.setModel(new DefaultTableModel());
+            jTable1.repaint();
+            
             scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte.replaceAll("\\r|\\n", " "));
 
             scriptTM.setPageSize(Integer.parseInt(pg));
@@ -162,8 +168,40 @@ public class DtoolDqlControl {
 
     }
 
-    public static void executeScript(JTable jTable1, JTextArea jTextArea2) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public static void executeScript(JTable jTable1, JTextArea jTextArea2, Boolean isDql) {
+        //Carregar linhas
+        LoginTableModel lTable = (LoginTableModel) jTable1.getModel();
+        
+        List <String[]> rows = lTable.getRows();
+        
+        for (String[] row : rows) {
+            //Configurações
+            String operation = row[1];
+            //operação
+            String config = row[0];
+            
+            if (isDql) {
+                if (operation.toLowerCase().startsWith("select")) {
+                    //execute query, return loginTable
+                    //export content utilizando opções de config, caso haja.
+                } else {
+                    //Execute operationa, return result
+                    //Gera Log.
+                };
+            } else {
+                
+            }
+
+        }
+        
+        //Carregar primeira operação
+        
+        //Se houver, carregar configurações
+        
+        //Executar migração
+        
+        
+        //Para cada item da lista executar a query.
     }
 
     public static void executeTemplate(String text, boolean jTextArea2Edited, JTable jTable1) {

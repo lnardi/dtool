@@ -175,6 +175,7 @@ public class ImportPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Delimitador de Colunas:");
 
+        jCheckBox3.setSelected(true);
         jCheckBox3.setText("Primeira linha com cabeçalho");
         jCheckBox3.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
