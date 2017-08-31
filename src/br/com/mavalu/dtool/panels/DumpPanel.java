@@ -58,6 +58,7 @@ public class DumpPanel extends javax.swing.JPanel {
         jButton6 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(" "));
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -123,6 +124,14 @@ public class DumpPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton7.setText("Export");
+        jButton7.setEnabled(false);
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,13 +144,15 @@ public class DumpPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane5)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -152,9 +163,10 @@ public class DumpPanel extends javax.swing.JPanel {
                     .addComponent(jButton5)
                     .addComponent(jButton6)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -273,11 +285,20 @@ public class DumpPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jTextField2KeyPressed
 
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+            if (DtoolDqlControl.validID(jTextField2.getText())) {
+                DtoolDqlControl.getContent(jTextField2.getText());
+            } else {
+                DtoolLogControl.log("Campo selecionado não é um r_object_id válido para exportação", Level.WARNING);
+            }
+    }//GEN-LAST:event_jButton7ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextArea jTextArea3;
@@ -301,10 +322,12 @@ public class DumpPanel extends javax.swing.JPanel {
             case DtoolJFrame.OP_SERVER_CONNECTION: //Login
                 jButton5.setEnabled(false);
                 jButton6.setEnabled(false);
+                jButton7.setEnabled(false);
                 break;
             case DtoolJFrame.OP_LOGIN: //Login
                 jButton5.setEnabled(status);
                 jButton6.setEnabled(status);
+                jButton7.setEnabled(status);
                 break;
             case DtoolJFrame.OP_DUMP: //dump
                 String[] list = (String[]) obj;
@@ -326,6 +349,7 @@ public class DumpPanel extends javax.swing.JPanel {
         jTextArea3.setText("Processando!!!!");
         jButton6.setEnabled(false);
         jButton5.setEnabled(false);
+        jButton7.setEnabled(false);
         jButton1.setEnabled(false);
         jTextField2.requestFocus();
 
@@ -341,6 +365,7 @@ public class DumpPanel extends javax.swing.JPanel {
             protected void done() {
                 jButton6.setEnabled(true);
                 jButton5.setEnabled(true);
+                jButton7.setEnabled(true);
                 jButton1.setEnabled(true);
                 jTextArea3.setCaretPosition(0);
                 dtoolJFrame.operationControl(dtoolJFrame.OP_DUMP, false, null);//remove a barra de progresso          

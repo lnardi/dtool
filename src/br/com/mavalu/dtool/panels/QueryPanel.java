@@ -35,6 +35,7 @@ public class QueryPanel extends javax.swing.JPanel {
     private boolean jTextArea2Edited;//controla se a query foi editada
     private boolean keyPressed;
     private SwingWorker workerExport;
+    private boolean alreadyExported = false;
 
     /**
      * Creates new form QueryPanel
@@ -116,6 +117,12 @@ public class QueryPanel extends javax.swing.JPanel {
             .addGap(0, 300, Short.MAX_VALUE)
         );
 
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
+
         jSplitPane2.setDividerLocation(150);
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
@@ -189,6 +196,7 @@ public class QueryPanel extends javax.swing.JPanel {
         jPanel9.setMaximumSize(new java.awt.Dimension(0, 0));
         jPanel9.setName(""); // NOI18N
 
+        jButton2.setMnemonic('R');
         jButton2.setText("Run");
         jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -197,6 +205,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton7.setMnemonic('Q');
         jButton7.setText("Query History >>");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -204,6 +213,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton10.setMnemonic('E');
         jButton10.setText("Export to CSV");
         jButton10.setEnabled(false);
         jButton10.addActionListener(new java.awt.event.ActionListener() {
@@ -212,6 +222,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton11.setMnemonic('C');
         jButton11.setText("Cancel");
         jButton11.setEnabled(false);
         jButton11.addActionListener(new java.awt.event.ActionListener() {
@@ -220,6 +231,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton14.setMnemonic('G');
         jButton14.setText("Gen. Script >>");
         jButton14.setEnabled(false);
         jButton14.addActionListener(new java.awt.event.ActionListener() {
@@ -228,6 +240,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton15.setMnemonic('I');
         jButton15.setText("Import CSV");
         jButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -484,6 +497,8 @@ public class QueryPanel extends javax.swing.JPanel {
         queryTableModel = null;
         jTable1.setModel(new DefaultTableModel());
         jTable1.repaint();
+        
+        alreadyExported = false;
 
         workerQuery = new SwingWorker() {
             @Override
@@ -531,6 +546,8 @@ public class QueryPanel extends javax.swing.JPanel {
                 jButton11.setEnabled(false);
                 jComboBox2.setEnabled(true);
                 jButton15.setEnabled(true);
+                jTextArea2.requestFocusInWindow();
+                jTextArea2.selectAll();
             }
 
         };
@@ -588,7 +605,7 @@ public class QueryPanel extends javax.swing.JPanel {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(selection, selection);
             jTable1.clearSelection();
-            
+
         }
 
 
@@ -775,6 +792,25 @@ public class QueryPanel extends javax.swing.JPanel {
      */
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
 
+        if (alreadyExported) {
+
+            Object[] options = {"OK",
+                "Cancela"};
+
+            int opt = JOptionPane.showOptionDialog(this.dtoolJFrame,
+                    "Este resultado de query já foi exportado. Exportar novamente?",
+                    "ATENÇAO!!!!",
+                    JOptionPane.WARNING_MESSAGE,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    null);
+            if (opt != 0) {
+                return;//Aborta exportação
+            }
+
+        }
+        alreadyExported = true;
         int row = jTable1.getSelectedRow();
         int col = jTable1.getSelectedColumn();
 
@@ -793,6 +829,7 @@ public class QueryPanel extends javax.swing.JPanel {
             }
         }
         jTable1.clearSelection();
+
 
     }//GEN-LAST:event_jButton10ActionPerformed
 
@@ -844,6 +881,9 @@ public class QueryPanel extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+    }//GEN-LAST:event_formFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -922,6 +962,8 @@ public class QueryPanel extends javax.swing.JPanel {
                 jComboBox2.setEnabled(status);
                 jButton7.setEnabled(status);
                 jButton10.setEnabled(status);
+                jTextArea2.requestFocusInWindow();
+                jTextArea2.selectAll();
                 break;
             case DtoolJFrame.OP_IMPORT_FILE:
                 queryTableModel = (LoginTableModel) obj;
@@ -934,7 +976,7 @@ public class QueryPanel extends javax.swing.JPanel {
 
             case DtoolJFrame.OP_REFRESH_QUERY_RESULT_TABLE:
                 jTable1.setModel(new DefaultTableModel());
-                jTable1.repaint();                
+                jTable1.repaint();
                 jTextField3.setEditable(false);
                 jButton10.setEnabled(false);
                 jButton11.setEnabled(false);
@@ -945,7 +987,7 @@ public class QueryPanel extends javax.swing.JPanel {
                 jButton9.setEnabled(false);
                 jComboBox2.setEnabled(false);
                 jButton2.setEnabled(true);
-                jButton7.setEnabled(true);                
+                jButton7.setEnabled(true);
                 break;
         }
     }

@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import org.apache.derby.iapi.services.io.ArrayUtil;
 
 /**
  *
@@ -314,26 +315,29 @@ public class LoginTableModel extends AbstractTableModel {
         return indexs;
     }
 
+    /**
+     * Import a csv file
+     *
+     * @param fileInput - File path
+     * @param fieldDelimiter - CSV delimiter, normaly ;
+     * @param columnDelimiter - colunm delimiter, normaly "
+     * @param hasColumns - Has
+     * @throws IOException
+     */
     public void importFile(BufferedReader fileInput, String fieldDelimiter, String columnDelimiter, boolean hasColumns) throws IOException {
 
         columns = new <String> ArrayList();
         rows = new <String[]> ArrayList();
         String attributeName = null;
-        String delimiter = null;
         String[] row = null;
 
-        //Read columns
-        if (fieldDelimiter != null) {
-            delimiter = fieldDelimiter + columnDelimiter + fieldDelimiter;
-        } else {
-            delimiter = columnDelimiter;
+        //If no column delimiter, set " to process broken lines
+        if (fieldDelimiter == null) {
+            fieldDelimiter = "\"";
         }
-
-        String line = null;
-        line = fileInput.readLine();
         //        
         if (hasColumns) {
-            String[] clm = line.split(delimiter);
+            String[] clm = ReadLine(fileInput, fieldDelimiter, columnDelimiter, null);
             //Define o tamanho do grid
             columnSize = new int[clm.length];
 
@@ -348,22 +352,20 @@ public class LoginTableModel extends AbstractTableModel {
                 columnSize[i] = attributeName.length();
             }
         } else {
-            String[] ln = line.split(delimiter);
+            String[] ln = ReadLine(fileInput, fieldDelimiter, columnDelimiter, null);
             //Criar colunas genericas
             for (int i = 0; i < ln.length; i++) {
                 columns.add("<COLUMN_" + i + ">");
             }
             //Define o tamanho do grid
             columnSize = new int[ln.length];
-            row = processRow(ln, fieldDelimiter);
+            row = processRow(ln, fieldDelimiter, columnDelimiter, fileInput);
             rows.add(row);
         }
+        String[] ln;
+        while ((ln = ReadLine(fileInput, fieldDelimiter, columnDelimiter, null)) != null) {
 
-        String value = null;
-        while ((line = fileInput.readLine()) != null) {
-            //
-            String[] ln = line.split(delimiter);
-            row = processRow(ln, fieldDelimiter);
+            row = processRow(ln, fieldDelimiter, columnDelimiter, fileInput);
             rows.add(row);
         }
         if (pageSize == 0) {
@@ -372,21 +374,88 @@ public class LoginTableModel extends AbstractTableModel {
 
     }
 
-    private String[] processRow(String[] ln, String fieldDelimiter) {
+    /**
+     * Assure that columns with broken lines will be processed
+     *
+     * @param fileInput
+     * @param fieldDelimiter
+     * @param columnDelimiter
+     * @param clmTmp
+     * @return
+     * @throws IOException
+     */
+    private String[] ReadLine(BufferedReader fileInput, String fieldDelimiter, String columnDelimiter, String[] clmTmp) throws IOException {
+        String line = null;
+        line = fileInput.readLine();
+        //If end of file return null or return last read value in case of recursive call;
+        if (line == null) {
+            if (clmTmp == null) {
+                return null;
+            } else {
+                return clmTmp;
+            }
+        }
+        String[] clm = line.split(columnDelimiter);
+
+        System.out.println(clm.length + " == " + clm[0]);
+        ///If yues, line is broken and we have a recursive call
+        if (clmTmp != null) {
+            String[] clmResult = new String[clmTmp.length + clm.length - 1];
+
+            System.arraycopy(clmTmp, 0, clmResult, 0, clmTmp.length);
+            if (clm.length > 1) {
+                System.arraycopy(clm, 1, clmResult, clmTmp.length, clm.length - 1);
+            }
+            clmResult[clmTmp.length - 1] = clmResult[clmTmp.length - 1] + " " + clm[0];
+            //
+            clm = clmResult;
+        }
+
+        //If las column start with delimiter verify if finish also.
+        if (clm[clm.length - 1].startsWith(fieldDelimiter)) {
+            //If yes, so its is ok
+            if (clm[clm.length - 1].endsWith(fieldDelimiter)) {
+                return clm;
+            } else {
+                //If no, has a line broken
+                return ReadLine(fileInput, fieldDelimiter, columnDelimiter, clm);
+            }
+        }
+        return clm;
+    }
+
+    private String[] processRow(String[] ln, String fieldDelimiter, String columnDelimiter, BufferedReader fileInput) throws IOException {
         String value = null;
         //String[] row = new String[ln.length];
         String[] row = new String[columns.size()];
+        int columnsList = 0;
+        for (int i = 0; i < ln.length && columnsList < columnSize.length; i++) {
 
-        for (int i = 0; i < ln.length; i++) {
+            String tmp = ln[i];
+            if (tmp.startsWith(fieldDelimiter)) {
+                while (i < ln.length && !ln[i].endsWith(fieldDelimiter)) {
+                    tmp = tmp + " " + ln[++i];
+                    //If the last possition load new line
+                    if (i == ln.length - 1) {
+                        ln[i] ="";
+                        ln = ReadLine(fileInput, fieldDelimiter, columnDelimiter, ln);
+                        i--;//Process again last line.
+                    }
+                }
+                
+                ln[i] = tmp;
+
+            }
             if (fieldDelimiter != null) {
                 value = ln[i].replace(fieldDelimiter, "");
             } else {
                 value = ln[i];
             }
-            row[i] = value;
-            if (value.length() > columnSize[i]) {
-                columnSize[i] = value.length();
+            row[columnsList] = value;
+            if (value.length() > columnSize[columnsList]) {
+                columnSize[columnsList] = value.length();
             }
+            columnsList++;
         }
 
         return row;

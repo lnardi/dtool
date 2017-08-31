@@ -173,6 +173,7 @@ public class ScriptPanel extends javax.swing.JPanel {
         jPanel9.setMaximumSize(new java.awt.Dimension(0, 0));
         jPanel9.setName(""); // NOI18N
 
+        jButton2.setMnemonic('R');
         jButton2.setText("Run");
         jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -181,6 +182,7 @@ public class ScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton10.setMnemonic('E');
         jButton10.setText("Export");
         jButton10.setEnabled(false);
         jButton10.addActionListener(new java.awt.event.ActionListener() {
@@ -189,6 +191,7 @@ public class ScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton11.setMnemonic('C');
         jButton11.setText("Cancel");
         jButton11.setEnabled(false);
         jButton11.addActionListener(new java.awt.event.ActionListener() {
@@ -197,6 +200,7 @@ public class ScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton14.setMnemonic('I');
         jButton14.setText("Import");
         jButton14.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

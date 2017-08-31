@@ -116,6 +116,7 @@ public class ImportPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton3.setMnemonic('C');
         jButton3.setText("Cancelar");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,6 +124,7 @@ public class ImportPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton4.setMnemonic('O');
         jButton4.setText("OK");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

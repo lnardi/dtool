@@ -137,6 +137,7 @@ public class DtoolExportControl {
         File fileOutputError = new File(finalNameError);
 
         BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+        DtoolLogControl.log("Gerando arquivo: " + finalName , Level.INFO);
 
         csv.write(header);
         csv.newLine();
@@ -165,6 +166,7 @@ public class DtoolExportControl {
                     finalName = beforeDot + "_" + fileNumber + afterDot;
                     fileOutput = new File(finalName);
                     csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                    DtoolLogControl.log("Gerando arquivo: " + finalName , Level.INFO);
                     //Insere o cabeçalho na próxima planilha
                     csv.write(header);
                     csv.newLine();
@@ -215,15 +217,14 @@ public class DtoolExportControl {
 
                 if (csvError == null) {
                     csvError = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutputError), "ISO-8859-1"));
+                    DtoolLogControl.log("Gerando arquivo de erros: " + finalNameError , Level.INFO);
                     csvError.write("Item;r_object_id;error");
                     csvError.newLine();
                 }
                 csvError.write(item + ";" + row[columnR_idFound] + ";" + error);
 
                 csvError.newLine();
-
             }
-
         }
 
         if (csvError != null) {

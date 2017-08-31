@@ -50,6 +50,9 @@ public class ExportPanel extends DToolJPanel {
         dtoolJFrame = dt;
         loginTableModel = ltm;
         query = q;
+        
+        //Associa Enter a bottão
+        jd.getRootPane().setDefaultButton(jButton4);
 
         if (path == null) {
             path = new File(".").getCanonicalPath();
@@ -132,6 +135,7 @@ public class ExportPanel extends DToolJPanel {
             }
         });
 
+        jButton3.setMnemonic('C');
         jButton3.setText("Cancelar");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -139,6 +143,7 @@ public class ExportPanel extends DToolJPanel {
             }
         });
 
+        jButton4.setMnemonic('O');
         jButton4.setText("OK");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -520,7 +525,6 @@ public class ExportPanel extends DToolJPanel {
            protected Object doInBackground() throws Exception {
 
                try {
-
                    dtoolJFrame.operationControl(dtoolJFrame.OP_PROGRESS_BAR, true, null);
                    dtoolJFrame.operationControl(dtoolJFrame.OP_EXPORT, false, null);
 
@@ -542,7 +546,8 @@ public class ExportPanel extends DToolJPanel {
                    } else {
                        numberOfThreads = (Long) jSpinner2.getValue();
                    }
-
+                   //Limita a 20
+                   
                    if (jCheckBox1.isSelected() || jCheckBox4.isSelected()) {
                        long startTime = System.currentTimeMillis();
 
@@ -559,7 +564,6 @@ public class ExportPanel extends DToolJPanel {
 
                        //Inicia a execução automaticamente;
                    } else {
-
                        DtoolExportControl.exportQueryGrid(csvFile,
                                loginTableModel.getRows(), loginTableModel.getColumns(), jCheckBox1.isSelected(), jRadioButton1.isSelected(), jComboBox1.getSelectedIndex(), dtoolJFrame, (jCheckBox2.isSelected() ? split_line_number : 0), jCheckBox4.isSelected(), jCheckBox5.isSelected(), jCheckBox6.isSelected(), jTextField4.getText());
                    }

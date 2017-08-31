@@ -53,6 +53,7 @@ public class ExportControl extends Thread {
     boolean breakCSVTemp = false;
     private String fileName = "";
     private boolean hasError = false;//Sinaliza que houve erro durante a exportação do arquivo corrente. 
+    private boolean processingDocs = false;
 
     public ExportControl(Iterator p_inputsLines, int p_size, String p_csvFile, String p_header, int p_dctmFolderExtruture, boolean p_expAllInFolderOrLikeServer, int p_columnID, long p_breakCSV, DtoolJFrame p_dtoolJFrame, Boolean p_expFolder, String p_exportPath, long p_numberOfThreads, boolean p_exportServerPath, boolean p_breakCSVByIchronicleid, int p_columnI_chronicle_idFound) throws IOException, DfException {
 
@@ -176,10 +177,10 @@ public class ExportControl extends Thread {
         return inputLinesSize;
     }
 
-    public void stopThreads() {
+    public void stopThreads() throws IOException, InterruptedException {
 
         for (DocumentumExportControl i : dIControlTheadList) {
-            i.setStop();            
+            i.setStop();
         }
         //inativa a thread de entrada
         active = false;
@@ -188,7 +189,8 @@ public class ExportControl extends Thread {
         boolean isActive = true;
 
         //Garante que todas as importação sendo processadas finalizaram e todas as threads inativaram.
-        while (isActive || processedLines.size() > 0) {
+        while ((isActive || processedLines.size() > 0) && processingDocs) {
+
             isActive = false;
 
             for (DocumentumExportControl i : dIControlTheadList) {
@@ -196,6 +198,23 @@ public class ExportControl extends Thread {
             }
 
         }
+
+        if (csvErrorOutput != null) {
+            csvErrorOutput.close();
+            csvErrorOutput = null;
+        }
+
+        if (csvOutput != null) {
+            csvOutput.close();
+            csvOutput = null;
+        }
+
+        if (processedLines.size() == 0) {
+            processedLines = null;
+        }
+
+        dIControlTheadList.clear();
+
     }
 
     public DocumentumExportControl newInportTread() throws IOException, DfException {
@@ -223,9 +242,8 @@ public class ExportControl extends Thread {
 
     @Override
     public void run() {
-        String[] msg = new String[1];
         try {
-            while (isActive() || processedLines.size() > 0) {
+            while (isActive() || (processedLines != null && processedLines.size() > 0)) {
                 while (processedLines.peek() != null && processedLines.peek().processed) {
                     TrheadDocPack tdp = processedLines.poll();
                     if (tdp.processed) {
@@ -235,8 +253,6 @@ public class ExportControl extends Thread {
                             processError(tdp);
                         }
                     }
-                    msg[0] = "" + item + " - Erros: " + erros;
-                    dtoolJFrame.operationControl(dtoolJFrame.OP_EXPORT_COUNT, false, msg);
                 }
 
                 //Se estiver em pausa, não possuir mais arquivos aguardando processamento
@@ -251,29 +267,39 @@ public class ExportControl extends Thread {
                         active = i.isActive() || active;
                     }
 
-                    //Escreve as linhas em memório
-                    if (csvErrorOutput != null) {
-                        csvErrorOutput.flush();
-                    }
-                    if (csvOutput != null) {
-                        csvOutput.flush();
-                    }
-
                     sleep(1000);
                 }
             }
-            //Finaliza os arquivos
-            if (csvErrorOutput != null) {
-                csvErrorOutput.flush();
-                csvErrorOutput.close();
-            }
-            csvOutput.flush();
-            csvOutput.close();
-
         } catch (Exception e) {
             // TODO - Como tratar este erro, mas deve paralizar tudo.
-            e.printStackTrace();
             DtoolLogControl.log(e, Level.SEVERE);
+        } finally {
+
+            try {
+                
+                //Do not close the file steam before write all lines.
+                try {
+                    while (processingDocs) {
+                        wait(500);
+                    }
+                } catch (InterruptedException ex) {
+                    DtoolLogControl.log(ex, Level.SEVERE);
+                }
+
+                //Finaliza os arquivos
+                if (csvErrorOutput != null) {
+                    csvErrorOutput.close();
+                    csvErrorOutput = null;
+                }
+                if (csvOutput != null) {
+                    csvOutput.close();
+                    csvOutput = null;
+                }
+            } catch (IOException e) {
+                // TODO - Como tratar este erro, mas deve paralizar tudo.                
+                DtoolLogControl.log(e, Level.SEVERE);
+            }
+
         }
     }
 
@@ -281,10 +307,14 @@ public class ExportControl extends Thread {
         //SE houver necessidade de quebrar oas arquivos 
         File fileOutput = null;
 
+        //Processing documents
+        processingDocs = true;
+
         if (csvOutput == null) {
             fileName = getOutputNextFileName();
             fileOutput = new File(fileName);
             csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+            DtoolLogControl.log("Gerando arquivo: " + fileName, Level.INFO);
             csvOutput.write(header);
             csvOutput.newLine();
         }
@@ -294,13 +324,13 @@ public class ExportControl extends Thread {
             if (breakCSVByIchronicleid && tdp.chronicle_id.equals(lastChronicle_id)) {//Finaliza o arquivo atual
                 breakCSVTemp = true;//Verifica novamente na próxima linha
             } else {
-                //Finaliza o arquivo atual
-                csvOutput.flush();
+                //Finaliza o arquivo atual                
                 csvOutput.close();
                 //Cria o próximo arquivo
                 fileName = getOutputNextFileName();
                 fileOutput = new File(fileName);
                 csvOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                DtoolLogControl.log("Gerando arquivo: " + fileName, Level.INFO);
                 //Insere o cabeçalho na próxima planilha
                 csvOutput.write(header);
                 csvOutput.newLine();
@@ -315,6 +345,11 @@ public class ExportControl extends Thread {
         //
         //Armazena o chronicle ID para verificar dependência
         lastChronicle_id = tdp.chronicle_id;
+
+        //Release process if queue is empty
+        if (processedLines.size() == 0) {
+            processingDocs = false;
+        }
     }
 
     private String getOutputNextFileName() {
@@ -338,6 +373,9 @@ public class ExportControl extends Thread {
     }
 
     private void processError(TrheadDocPack tdp) throws UnsupportedEncodingException, IOException {
+        //Processing documents
+        processingDocs = true;
+        
         hasError = true;
         DtoolLogControl.log("Erro da linha: " + tdp.line, Level.WARNING);
         String error = tdp.error.replace(";", "-");
@@ -345,14 +383,21 @@ public class ExportControl extends Thread {
         DtoolLogControl.log(error, Level.WARNING);
         ++erros;
         if (csvErrorOutput == null) {
-            File fileOutputError = new File(getErrorOutputFileName());
+            String fileNameError = getErrorOutputFileName();
+            File fileOutputError = new File(fileNameError);
             csvErrorOutput = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutputError), "ISO-8859-1"));
+            DtoolLogControl.log("Gerando arquivo de erros: " + fileNameError, Level.INFO);
             csvErrorOutput.write("Item;r_object_id;error");
             csvErrorOutput.newLine();
         }
         csvErrorOutput.write(item + ";" + tdp.id + ";" + error);
 
         csvErrorOutput.newLine();
+
+        //Release process if queue is empty
+        if (processedLines.size() == 0) {
+            processingDocs = false;
+        }
 
     }
 
@@ -367,8 +412,17 @@ public class ExportControl extends Thread {
     public String getFileOutputName() {
         return fileName;
     }
-    
-    public boolean getHasError(){
+
+    public boolean getHasError() {
         return hasError;
     }
+
+    public int getNumberProcessedFile() {
+        return item;
+    }
+
+    public int getNumberErrorProcessedFile() {
+        return erros;
+    }
+
 }

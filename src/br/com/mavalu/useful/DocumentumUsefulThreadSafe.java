@@ -258,15 +258,19 @@ public class DocumentumUsefulThreadSafe {
 
         IDfSession session = sessionMgr.getSession(loginDocbase);
 
-        IDfDocument doc
-                = (IDfDocument) session.getObject(new DfId(id));
+        //IDfDocument doc = (IDfDocument) session.getObject(new DfId(id));
         //VErifica se possui conteúdo.
-        if (doc.getContentSize() == 0) {
-            return "";
-        }
+//        if (doc.getContentSize() == 0) {
+//            return "";
+//        }
         try {
             return session.apiGet("getpath", id);
-        } finally {
+            //return doc.getPath(0);       
+        }
+        catch (DfException ex) {
+            return "";
+        }
+        finally {
             sessionMgr.release(session);
         }
 

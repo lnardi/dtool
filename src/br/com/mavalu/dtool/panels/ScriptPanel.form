@@ -262,6 +262,7 @@
               <SubComponents>
                 <Component class="javax.swing.JButton" name="jButton2">
                   <Properties>
+                    <Property name="mnemonic" type="int" value="82"/>
                     <Property name="text" type="java.lang.String" value="Run"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -271,6 +272,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="jButton10">
                   <Properties>
+                    <Property name="mnemonic" type="int" value="69"/>
                     <Property name="text" type="java.lang.String" value="Export"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -280,6 +282,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="jButton11">
                   <Properties>
+                    <Property name="mnemonic" type="int" value="67"/>
                     <Property name="text" type="java.lang.String" value="Cancel"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
@@ -289,6 +292,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="jButton14">
                   <Properties>
+                    <Property name="mnemonic" type="int" value="73"/>
                     <Property name="text" type="java.lang.String" value="Import"/>
                   </Properties>
                   <Events>
