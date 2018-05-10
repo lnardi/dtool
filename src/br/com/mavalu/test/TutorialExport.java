@@ -5,6 +5,7 @@
  */
 package br.com.mavalu.test;
 
+import br.com.mavalu.dtool.control.DtoolLogControl;
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.DfServiceException;
@@ -110,7 +111,7 @@ public class TutorialExport {
       try {
          te.exportExample();
       } catch (Exception ex) {
-         Logger.getLogger(TutorialExport.class.getName()).log(Level.SEVERE, null, ex);
+         DtoolLogControl.log(ex, Level.SEVERE);
       }
 
    }

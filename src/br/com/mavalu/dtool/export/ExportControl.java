@@ -20,9 +20,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 
-public class ExportControl extends Thread {
-
-    private static Logger logger = Logger.getLogger(ExportControl.class.getName());
+public class ExportControl extends Thread {    
 
     private int item = 0;
     private int erros = 0;
@@ -177,7 +175,7 @@ public class ExportControl extends Thread {
         return inputLinesSize;
     }
 
-    public void stopThreads() throws IOException, InterruptedException {
+    public void stopThreads() throws IOException {
 
         for (DocumentumExportControl i : dIControlTheadList) {
             i.setStop();
@@ -196,7 +194,6 @@ public class ExportControl extends Thread {
             for (DocumentumExportControl i : dIControlTheadList) {
                 isActive = i.isActive() || isActive;
             }
-
         }
 
         if (csvErrorOutput != null) {
@@ -306,7 +303,6 @@ public class ExportControl extends Thread {
     private void processSucess(TrheadDocPack tdp) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         //SE houver necessidade de quebrar oas arquivos 
         File fileOutput = null;
-
         //Processing documents
         processingDocs = true;
 

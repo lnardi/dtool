@@ -5,6 +5,7 @@
  */
 package br.com.mavalu.test;
 
+import br.com.mavalu.dtool.control.DtoolLogControl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -181,7 +182,7 @@ public class JavaDBTest {
                 sqlExcept.printStackTrace();
             }
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(JavaDBTest.class.getName()).log(Level.SEVERE, null, ex);
+            DtoolLogControl.log(ex, Level.SEVERE);
         }
     }
 

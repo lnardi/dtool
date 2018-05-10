@@ -15,25 +15,38 @@ import java.util.regex.Pattern;
  */
 public class GenericTest {
 
-   public static void main(String args[]) {
-      /* Set the Nimbus look and feel */
+   public static void main(String args[]) { 
+    /* Set the Nimbus look and feel */
 
-      //Pattern PATTERN = Pattern.compile("[^A-Za-z0-9çÇ   ã\t\nÃõÕ_\\-\\.]");
+    //Pattern PATTERN = Pattern.compile("[^A-Za-z0-9çÇ   ã\t\nÃõÕ_\\-\\.]");
 
-      //String a = "::CONCEI?AO DA PAIXAO MACIEL DE SA DOS|| SANTOç:ÇS* - 3484146.pdf -|";
-      //String a = "[TAÃ??S CA   R\t\nLA MA\\GA//LH>Ã<as;;;s?Æ?E\"S]";
+    //String a = "::CONCEI?AO DA PAIXAO MACIEL DE SA DOS|| SANTOç:ÇS* - 3484146.pdf -|";
+    //String a = "[TAÃ??S CA   R\t\nLA MA\\GA//LH>Ã<as;;;s?Æ?E\"S]";
       
       
-      String[]  temp = "testes.csv".split("\\.");
-       String csvFile_1 =  temp[0] + "._1" + temp[1];
+    String[]  temp = "testes.csv".split("\\.");
+    String csvFile_1 =  temp[0] + "._1" + temp[1];
       
       
-      System.out.println(csvFile_1);
-      // String a = "TAÃiS CARLA MAnGALHÃES";
+    System.out.println(csvFile_1);
+    String a = "CR_XVIII_INTERNATIONAL_BIOHYDROMETALLURGY_SYMPOSIUM_-_IBS_2009_13092009";
 
-      //System.out.println("String: " + a.replaceAll("[^A-Za-z0-9Ç\\ÃÕÔ//ÁÉÊÛ_\\s_\\-\\.]", "#"));
-      //System.out.println("String: " + a.replaceAll("[\\?]", "#"));
-      //System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));     
+//a = "CR_XVIII_INTERNATINAL_BIOHYDROMETALLURGY_SYMPOSIUM_-_IBS_2009_13092009Jimin TR_199906_srb_pet_Estudo_Petrologico_e\n" +
+    //           "Geocronologico Yanga,b, 'ªº°°°R!\"uizhi Zhangc, Hong Liua, and \\Sihong Maa.Solid-liquid phase equilibria at " + 
+    //         "50 and 75\\ÂC i[]}{,.,<>;:/?*/-+n the NaCl + MgCl2 + H2O çÇóÓôÔõÕéÉê\\/Êâ<>ÂáÁ\"àÀ?ãÃ*íÍ:sy/\\stem and the pitzer model represen-_tati][{}ons.pdf\\";
+
+    // System.out.println("String: " + a.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°\\\\]", " "));
+    System.out.println("String: " + a.replaceAll("[\\t\\r\\n\\u000B]", "#######"));
+     
+     
+   // System.out.println("String: " + a.indexOf("@Lower(")finreplaceAll("[\\t\\r\\n\\u000B]", "#######"));
+     
+    int ind1 = a.indexOf("@Lower(");
+    int ind2 = a.indexOf(")", ind1);
+     
+       
+     
+    // System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));     
 
       
 //        System.out.println("String: " + a.replaceAll("[\\]\\[\\\"]", ""));
@@ -42,10 +55,13 @@ public class GenericTest {
 
       
       
-       for (int i = 1; i < 100; i++) {
-           System.out.println("Result: I= " + i + " %: " + i%10);
-       }
+  //     for (int i = 1; i < 100; i++) {
+    //       System.out.println("Result: I= " + i + " %: " + i%10);
+      // }
       
+  //    String aa = "0123456789";
+      
+   //   System.out.println(aa.substring(0, aa.length()));
       
       /**
        * try {

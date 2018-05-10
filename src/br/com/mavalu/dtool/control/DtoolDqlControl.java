@@ -5,6 +5,7 @@
  */
 package br.com.mavalu.dtool.control;
 
+import br.com.mavalu.dtool.DtoolJFrame;
 import br.com.mavalu.useful.DocumentumUseful;
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
@@ -12,11 +13,13 @@ import java.util.logging.Level;
 import javax.swing.JTable;
 import br.com.mavalu.useful.LoginTableModel;
 import java.awt.Desktop;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JTextArea;
+import javax.swing.JViewport;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -26,7 +29,7 @@ import javax.swing.table.TableColumn;
  */
 public class DtoolDqlControl {
 
-    public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited, int dateFormat) throws DfException {
+    public static void executeQuery(String q, JTable jTable1, String top, String pg, boolean queryEdited, int dateFormat, DtoolJFrame dtoolJFrame) throws DfException {
 
         DtoolLogControl.log("Executando query : \n" + q, Level.INFO);
 
@@ -39,7 +42,10 @@ public class DtoolDqlControl {
                 pg = "0";
             }
 
-            LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg), dateFormat);
+            DtoolLogControl.log("Query retornada, montando grid", Level.INFO);
+
+            LoginTableModel queryTM = new LoginTableModel(col, Integer.parseInt(pg), dateFormat, dtoolJFrame);
+
             TableColumn column = null;
 
             jTable1.setModel(queryTM);
@@ -73,12 +79,12 @@ public class DtoolDqlControl {
 
     }
 
-    public static String apiexec(String q) {
+    public static String apiexecDump(String q) {
 
         try {
             DtoolLogControl.log("Dumping ID: " + q, Level.INFO);
 
-            return DocumentumUseful.apiExec(q);
+            return DocumentumUseful.apiExecDump(q);
         } catch (DfException ex) {
             DtoolLogControl.log(ex, Level.SEVERE);
         }
@@ -130,7 +136,7 @@ public class DtoolDqlControl {
         return exportOK;
     }
 
-    public static void executeScriptTemplate(LoginTableModel queryTableModel, JTable jTable1, String scriptTempalte, int dateFormat, String pg) {
+    public static void executeScriptTemplate(LoginTableModel queryTableModel, JTable jTable1, String scriptTempalte, int dateFormat, String pg, boolean removeBreak, boolean changeCase) {
 
         LoginTableModel scriptTM = new LoginTableModel(dateFormat);
 
@@ -139,12 +145,15 @@ public class DtoolDqlControl {
         }
 
         try {
-            
+
             jTable1.setModel(new DefaultTableModel());
             jTable1.repaint();
-            
-            scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte.replaceAll("\\r|\\n", " "));
 
+            if (removeBreak){
+                scriptTempalte = scriptTempalte.replaceAll("\\r|\\n", " ");
+            }
+            scriptTM.executeScriptTemplate(queryTableModel, scriptTempalte, changeCase);
+            
             scriptTM.setPageSize(Integer.parseInt(pg));
 
             TableColumn column = null;
@@ -171,41 +180,86 @@ public class DtoolDqlControl {
     public static void executeScript(JTable jTable1, JTextArea jTextArea2, Boolean isDql) {
         //Carregar linhas
         LoginTableModel lTable = (LoginTableModel) jTable1.getModel();
+
+        List<String[]> rows = lTable.getRows();
         
-        List <String[]> rows = lTable.getRows();
-        
-        for (String[] row : rows) {
+        boolean apiFail = false;
+
+        for (int i = 0; i < rows.size() && !apiFail; i++) {
+
+            String[] row = rows.get(i);
+
+            //SelectLine            
+            jTable1.setRowSelectionInterval(i, i);
+            scrollToSelectedRow(jTable1);
+            jTable1.repaint();
+
             //Configurações
-            String operation = row[1];
+            //String operation = row[0];
             //operação
-            String config = row[0];
-            
+            String query = row[0];
+
+            //Coloca o item executado na textArea
+            jTextArea2.setText(query);
+
             if (isDql) {
-                if (operation.toLowerCase().startsWith("select")) {
+                if (query.toLowerCase().startsWith("select")) {
                     //execute query, return loginTable
                     //export content utilizando opções de config, caso haja.
-                } else {
-                    //Execute operationa, return result
-                    //Gera Log.
-                };
-            } else {
-                
-            }
+                    //DtoolLogControl.log("NÃO ESTÁ IMPLEMENTADO", Level.SEVERE);
 
+                } else {
+                    //Execute operation, return result
+                    IDfCollection col = null;
+                    try {
+                        //Gera Log.
+                        DtoolLogControl.log("Query: " + query, Level.INFO);
+                        //Remove qualquer quebra de linha na query         
+                        col = DocumentumUseful.executarQuery(query.replaceAll("\\r|\\n", " "), 1, "NO");
+                        //Loga o resultado
+                        String celName = col.getAttr(0).getName();
+
+                        if (col.next()) {
+                            DtoolLogControl.log(celName + ": " + col.getValueAt(0).asString(), Level.INFO);
+                        } else {
+                            DtoolLogControl.log("Result: <SUCESSO>", Level.INFO);
+                        }
+                    } catch (DfException ex) {
+                        DtoolLogControl.log("Result: " + ex.getMessage(), Level.SEVERE);
+                    }
+                }
+
+            } else {
+                DtoolLogControl.log("NÃO ESTÁ IMPLEMENTADO", Level.SEVERE);
+                //Execute operation, return result                    
+                //try {
+                //Remove qualquer quebra de linha na query         
+                //String ret = DocumentumUseful.apiExec(query.replaceAll("\\r|\\n", ""));
+                //Loga o resultado                        
+                //  DtoolLogControl.log(ret, Level.INFO);
+                //} catch (DfException ex) {
+                //  DtoolLogControl.log("Result: " + ex.getMessage(), Level.SEVERE);
+                //  apiFail = true;
+                // }
+            }
+            jTextArea2.setText("");
         }
-        
+
         //Carregar primeira operação
-        
         //Se houver, carregar configurações
-        
         //Executar migração
-        
-        
         //Para cada item da lista executar a query.
     }
 
     public static void executeTemplate(String text, boolean jTextArea2Edited, JTable jTable1) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DtoolLogControl.log("======================================NAO IMPLEMENTADO==================================", Level.WARNING);
+    }
+
+    private static void scrollToSelectedRow(JTable table) {
+        JViewport viewport = (JViewport) table.getParent();
+        Rectangle cellRectangle = table.getCellRect(table.getSelectedRow(), 0, true);
+        Rectangle visibleRectangle = viewport.getVisibleRect();
+        table.scrollRectToVisible(new Rectangle(cellRectangle.x, ((cellRectangle.y <= 48) ? 0 : (cellRectangle.y - 48)), (int) visibleRectangle.getWidth(), (int) visibleRectangle.getHeight()));
     }
 
 }

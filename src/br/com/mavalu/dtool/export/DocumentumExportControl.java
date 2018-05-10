@@ -40,6 +40,8 @@ public class DocumentumExportControl extends Thread {
     private String status = "Inativa";
     private long fileProcessedSize = 0;
     private long lastFileProcessedSize = 0;
+    private String exportId = "";
+    private int item = -1;
 
     public DocumentumExportControl(ExportControl migrationControl, String docbase, IDfLoginInfo li) throws IOException, DfException {
 
@@ -70,7 +72,10 @@ public class DocumentumExportControl extends Thread {
                             if (mc.exportServerPath()) {
                                 path = documentumUseful.apiExecSize(tdc.id);
                             } else {
-                                //exporta o conteúdo da docbase
+                                //Guarda o ID para Report
+                                exportId = tdc.id;
+                                item = tdc.item;
+                                //exporta o conteúdo da docbase                                
                                 path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
                             }
                             tdc.line += ";" + path;
@@ -78,10 +83,13 @@ public class DocumentumExportControl extends Thread {
                             fileProcessedSize += tdc.size;
                         } catch (DfException ex) {
                             tdc.success = false;
-                            Logger.getLogger(DocumentumExportControl.class.getName()).log(Level.SEVERE, null, ex);
+                            DtoolLogControl.log(ex, Level.SEVERE);
                             String error = ex.getMessage().replace(";", "-");
                             tdc.line += ";/////////ERROR////////;" + error;
                             tdc.error = error;
+                        } catch (Exception ex) {
+                            DtoolLogControl.log(ex, Level.SEVERE);
+                            setStop();
                         } finally {
                             tdc.processed = true;
                         }
@@ -212,9 +220,7 @@ public class DocumentumExportControl extends Thread {
 
     public String getsStatus() {
         /**
-         * String status = "Ativa"; if (isActiveRealTime && pauseRealTime) {
-         * status = "Pausada"; } else if (!isActiveRealTime) { status =
-         * "Inativa"; }
+         * String status = "Ativa"; if (isActiveRealTime && pauseRealTime) { status = "Pausada"; } else if (!isActiveRealTime) { status = "Inativa"; }
          *
          * return status;
          *
@@ -226,6 +232,14 @@ public class DocumentumExportControl extends Thread {
 
         return isActiveRealTime;
 
+    }
+
+    public String getExportId() {
+        return exportId;
+    }
+    
+    public int getItem() {
+        return item;
     }
 
 }

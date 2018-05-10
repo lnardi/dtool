@@ -356,7 +356,7 @@ public class DumpPanel extends javax.swing.JPanel {
         SwingWorker worker = new SwingWorker<Void, Integer>() {
             @Override
             protected Void doInBackground() throws Exception {
-                jTextArea3.setText(DtoolDqlControl.apiexec(jTextField2.getText()));
+                jTextArea3.setText(DtoolDqlControl.apiexecDump(jTextField2.getText().trim()));
 
                 return null;
             }

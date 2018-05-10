@@ -48,8 +48,7 @@ public class DocumentumUseful {
 
     /**
      * @param q String com a query
-     * @param type Define o tipo de query. 0 para select e 1 para update.
-     * Existem outros tipos que podem ser implementados.
+     * @param type Define o tipo de query. 0 para select e 1 para update. Existem outros tipos que podem ser implementados.
      * @param top Defini se a query utilizar o return_top e a quantidade
      * @return Coleção de objetos
      * @throws DfException
@@ -230,12 +229,26 @@ public class DocumentumUseful {
 
     }
 
-    public static String apiExec(String q) throws DfException {
+    public static String apiExecDump(String q) throws DfException {
 
         IDfSession session = sessionMgr.getSession(loginDocbase);
         try {
 
             return session.getObject(new DfId(q)).dump();
+
+        } finally {
+            sessionMgr.release(session);
+        }
+
+    }
+
+    public static boolean apiExecT(String q) throws DfException {
+
+        IDfSession session = sessionMgr.getSession(loginDocbase);
+        try {                
+            
+          //  if(q.startsWith("set"))         
+          return session.apiExec(q,q);
 
         } finally {
             sessionMgr.release(session);
@@ -263,8 +276,7 @@ public class DocumentumUseful {
      * Reverse maps a mime-type to a repository format.
      *
      * @param ext The DOS extention whitout dot "."
-     * @return The corresponding repository format. If multiple formats are
-     * found <br>
+     * @return The corresponding repository format. If multiple formats are found <br>
      * the first one is returned by default. A <code>null</code> is <br>
      * returned if no format can be found.
      */
@@ -412,15 +424,15 @@ public class DocumentumUseful {
 
                 String folderPath = path.toString() + "/" + fd.getFolderPath(0);
 
-                folderPath = folderPath.replaceAll("[\\?]", "#");
-                folderPath = folderPath.replaceAll("[\\|\\:\\*]", "");
+                folderPath = folderPath.replaceAll("[\\t\\r\\n\\u000B]", " ");
+                folderPath = folderPath.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°\\\\////]", "");
 
                 File dir = new File(folderPath);
                 dir.mkdirs();
 
                 String name = doc.getObjectName();
-                name = name.replaceAll("[\\?]", "#");
-                name = name.replaceAll("[\\|\\:\\*]", "");
+                name = name.replaceAll("[\\t\\r\\n\\u000B]", " ");
+                name = name.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°]", "");
 
                 String list[] = name.split("\\.");
 
@@ -485,8 +497,8 @@ public class DocumentumUseful {
 
                 String dctmFolderPath = fd.getFolderPath(0);
 
-                dctmFolderPath = dctmFolderPath.replaceAll("[\\?]", "#");
-                dctmFolderPath = dctmFolderPath.replaceAll("[\\n\\t\\\\\\:\\*\\?\\\"\\<\\>\\|]", "");
+                dctmFolderPath = dctmFolderPath.replaceAll("[\\t\\r\\n\\u000B]", " ");
+                dctmFolderPath = dctmFolderPath.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°\\\\////]", "");
 
                 dctmFolderPath = dctmFolderPath.trim();
 
@@ -506,8 +518,8 @@ public class DocumentumUseful {
             }
 
             String name = doc.getObjectName();
-            name = name.replaceAll("[\\?]", "#");
-            name = name.replaceAll("[\\n\\t\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", " ");
+            name = name.replaceAll("[\\t\\r\\n\\u000B]", " ");
+            name = name.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°]", " ");
 
             String list[] = name.split("\\.");
 
@@ -561,9 +573,7 @@ public class DocumentumUseful {
             /**
              * int length = doc.getValueCount("anomalia");
              *
-             * for (int i = 0; i < length; ++i) { anomalia +=
-             * doc.getRepeatingString("anomalia", i); if ((i + 1) < length) {
-             * anomalia += "|"; } }
+             * for (int i = 0; i < length; ++i) { anomalia += doc.getRepeatingString("anomalia", i); if ((i + 1) < length) { anomalia += "|"; } }
              *
              */
             /////
@@ -602,8 +612,8 @@ public class DocumentumUseful {
             }
 
             String name = doc.getObjectName();
-            name = name.replaceAll("[\\?]", "#");
-            name = name.replaceAll("[\\n\\t\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", " ");
+            name = name.replaceAll("[\\t\\r\\n\\u000B]", " ");
+            name = name.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°]", " ");
 
             String list[] = name.split("\\.");
 
@@ -636,16 +646,14 @@ public class DocumentumUseful {
     /**
      * public static String getAnomalia(String r_id) throws DfException {
      *
-     * IDfSession session = sessionMgr.getSession(loginDocbase); String anomalia
-     * = ""; try {
+     * IDfSession session = sessionMgr.getSession(loginDocbase); String anomalia = ""; try {
      *
      * IDfDocument doc = (IDfDocument) session.getObject(new DfId(r_id));
      *
      * int length = doc.getValueCount("anomalia");
      *
-     * for (int i = 0; i < length; ++i) { anomalia +=
-     * doc.getRepeatingString("anomalia", i); if ((i + 1) < length) { anomalia
-     * += "|"; } } } finally { sessionMgr.release(session); }
+     * for (int i = 0; i < length; ++i) { anomalia += doc.getRepeatingString("anomalia", i); if ((i + 1) < length) { anomalia += "|"; } } } finally {
+     * sessionMgr.release(session); }
      *
      * return anomalia;
      *
@@ -676,7 +684,7 @@ public class DocumentumUseful {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                Logger.getLogger(DocumentumUseful.class.getName()).log(Level.SEVERE, null, ex);
+                DtoolLogControl.log(ex, Level.SEVERE);
                 DtoolLogControl.log("Falha no login: " + ex.getMessage(), Level.SEVERE);
             }
 

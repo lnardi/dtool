@@ -321,7 +321,7 @@ public class DtoolExportControl {
 
     }
 
-    public static void exportScriptGrid(String csvFile, List<String[]> rowsList, boolean isDQL, DtoolJFrame dtoolJFrame, long breakCSV) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    public static void exportScriptGrid(String csvFile, List<String[]> rowsList, boolean isDQL, DtoolJFrame dtoolJFrame, long breakCSV, String charCoding ) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         long startTime = System.currentTimeMillis();
 
         Iterator<String[]> rows = rowsList.iterator();
@@ -342,7 +342,7 @@ public class DtoolExportControl {
 
         File fileOutput = new File(finalName);
 
-        BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+        BufferedWriter csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), charCoding));
 
         while (rows.hasNext()) {
 
@@ -357,7 +357,7 @@ public class DtoolExportControl {
                 fileNumber++;
                 finalName = beforeDot + "_" + fileNumber + afterDot;
                 fileOutput = new File(finalName);
-                csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "ISO-8859-1"));
+                csv = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), charCoding));
                 //Insere o cabeçalho na próxima planilha                
                 csv.newLine();
             }

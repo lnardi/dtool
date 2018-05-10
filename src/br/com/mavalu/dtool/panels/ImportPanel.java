@@ -312,6 +312,7 @@ public class ImportPanel extends javax.swing.JPanel {
        jDialog.setVisible(false);
        file_name = jTextField2.getText();
        path = jTextField1.getText();
+       DtoolLogControl.log("======================================IMPORTANDO SCRIPT==================================", Level.WARNING);
 
        // jRadioButton5 ==> Reexecutar a query e exportar o resultado;
        // jRadioButton4 ==>Exportar resultado apresentado no grid:
@@ -342,6 +343,7 @@ public class ImportPanel extends javax.swing.JPanel {
                        DtoolImportControl.ImportToGrid(fileImput, jTable, dtoolJFrame, (jCheckBox2.isSelected() ? jTextField4.getText() : null), jTextField5.getText(), jCheckBox3.isSelected(), Integer.parseInt(pgSize), loadScript);
 
                        DtoolLogControl.log("Processo de Importação finalizado com sucesso - Tempo: " + ((System.currentTimeMillis() - startTime) / 1000) + " Segundos", Level.INFO);
+                       DtoolLogControl.log("Arquivo: " + file_name + " Importado", Level.INFO);
 
                    }
 

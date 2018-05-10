@@ -308,7 +308,7 @@ public class LoginPanel extends javax.swing.JPanel {
                 } else {
                     boolean loginResult = DtoolLoginControl.login(docbase, user, password);
                     dtoolJFrame.operationControl(dtoolJFrame.OP_LOGIN, true, null);
-                    dtoolJFrame.operationControl(dtoolJFrame.OP_LOGIN_CREDENTIALS, true, new String[]{user, docbase});
+                    dtoolJFrame.operationControl(dtoolJFrame.OP_LOGIN_CREDENTIALS, true, new String[]{user, docbase, DtoolLoginControl.getDocbrockerDomain()});
                     if (loginResult) {
                         DtoolLogControl.log("Logando com usuário ( " + user + " )", Level.INFO);
                         //Registra o novo login na tabela de logins;

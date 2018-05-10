@@ -266,11 +266,9 @@ public class DocumentumUsefulThreadSafe {
         try {
             return session.apiGet("getpath", id);
             //return doc.getPath(0);       
-        }
-        catch (DfException ex) {
+        } catch (DfException ex) {
             return "";
-        }
-        finally {
+        } finally {
             sessionMgr.release(session);
         }
 
@@ -357,7 +355,7 @@ public class DocumentumUsefulThreadSafe {
 
         dec = dec - 4294967296.0;
 
-        System.out.println(String.format("%.0f", dec));
+        //System.out.println(String.format("%.0f", dec));
 
     }
 
@@ -409,7 +407,6 @@ public class DocumentumUsefulThreadSafe {
     }
 
     public String exportDocument(String path, String relativePath, TrheadDocPack tdc, int dctmFolderExtruture, boolean expAllInFolderOrLikeServer) throws DfException {
-
         //TODO - Remover após embratel
         //String anomalia = "";
         String documentPath = "";
@@ -438,34 +435,25 @@ public class DocumentumUsefulThreadSafe {
                     //Tenta exportar a extrutura padrão.
                     id = doc.getFolderId(0);
                 }
-
+                
                 IDfFolder fd = (IDfFolder) session.getObject(id);
 
                 String dctmFolderPath = fd.getFolderPath(0);
 
-                dctmFolderPath = dctmFolderPath.replaceAll("[\\?]", "#");
-                dctmFolderPath = dctmFolderPath.replaceAll("[\\n\\t\\\\\\:\\*\\?\\\"\\<\\>\\|]", "");
-
+                dctmFolderPath = dctmFolderPath.replaceAll("[\\r\\n\\u000B]", " ");
+                dctmFolderPath = dctmFolderPath.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\?\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°\\\\////]", "");
                 dctmFolderPath = dctmFolderPath.trim();
 
                 folderPath = path + dctmFolderPath;
-
                 documentPath = dctmFolderPath;
 
             } else {
                 folderPath = path;
             }
 
-            File dir = new File(folderPath);
-            if (!dir.exists()) {
-                if (!dir.mkdirs()) {
-
-                }
-            }
-
             String name = doc.getObjectName();
-            name = name.replaceAll("[\\?]", "#");
-            name = name.replaceAll("[\\n\\t\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", " ");
+            name = name.replaceAll("[\\t\\r\\n\\u000B]", " ");
+            name = name.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°]", " ");
 
             String list[] = name.split("\\.");
 
@@ -481,24 +469,51 @@ public class DocumentumUsefulThreadSafe {
 
             String fileName = tdc.item + "_" + name;
 
+            //Reduziu o tamanho do folder
+            boolean reduziufolder = false;
             //Garante que o path mais o nome do arquivo não excedam 256 caracteres
             if ((folderPath.length() + fileName.length()) > 256) {
 
-                String contentType = doc.getString("a_content_type");
-                String dosExtention = getRepsitoryDosFormatFromMimeType(contentType);
+                if (folderPath.length() > 210) {
+                    reduziufolder = true;
+                    folderPath = path + "/==Maximum Path Length Exceeded==";
+                } else {
+                    if (fileName.length() > 40) {
+                        String contentType = doc.getString("a_content_type");
+                        String dosExtention = getRepsitoryDosFormatFromMimeType(contentType);
 
-                fileName = tdc.item + "." + dosExtention;
-
+                        int sizeFileName = 250 - (String.valueOf(tdc.item).length() + dosExtention.length() + folderPath.length());
+                        //Se a tamanho restante é maior que o tamanho do nome. Utiliza o tamanho do nome.
+                        sizeFileName = sizeFileName > name.length() ? name.length() : sizeFileName;                        
+                        fileName = tdc.item + "_" + name.substring(0, sizeFileName) + "___." + dosExtention;
+                    }
+                }
                 if ((folderPath.length() + fileName.length()) > 256) {
                     throw new DfException("Error - Nome do arquivo mais o path escolhido excederam o tamanho máximo suportado pelo sistema(256).");
                 }
             }
-            folderPath += "/" + fileName;
 
+            //Se o folder não existe, cria
+            File dir = new File(folderPath);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                }
+            }
+
+            //Associa o folder ao nome do arquivo.            
+            folderPath += "/" + fileName;
+            //Caminho relalivo para colocar na planilha de export.
             documentPath += "/" + fileName;
             if (relativePath != null) {
                 documentPath = "/" + relativePath + documentPath;
             }
+            //==============================================================
+            //Se o caminho reduzido, o caminho completo vai para coluna erro;
+            //==Vou forçar a inserção de mais uma coluna colocando o ;
+            if (reduziufolder) {
+                documentPath = "/==Maximum Path Length Exceeded==/" + fileName + ";Maximum Path Length Exceeded - Original Path: " + documentPath;
+            }
+            //========================================================= 
 
             File file = new File(folderPath);
 
@@ -506,24 +521,16 @@ public class DocumentumUsefulThreadSafe {
             if (!(file.exists() && file.length() == doc.getContentSize())) {
                 //Pega o tamanho
                 //TODO - Descomentar
-
                 tdc.size = doc.getContentSize();
+
                 // Create an export node, adding the document to the export operation object.
                 IDfExportNode node = (IDfExportNode) eo.add(doc);
 
                 node.setFilePath(folderPath);
 
                 if (!eo.execute()) {
-
                     throw new DfException("Exportação falhou ==> /n/r " + eo.getErrors());
                 }
-                /**
-                 * ////TODO - REMOVER, É SÓ PARA TESTES Writer writer = null; try { writer = new BufferedWriter(new OutputStreamWriter( new
-                 * FileOutputStream(folderPath), "utf-8")); writer.write("Something"); } catch (IOException ex) { ex.printStackTrace(); } finally { try {
-                 * writer.close(); } catch (Exception ex) { } }
-                 *
-                 */
-
             }
         } finally {
             sessionMgr.release(session);
@@ -531,7 +538,7 @@ public class DocumentumUsefulThreadSafe {
 
         return documentPath;
     }
-    
+
     public String getRepsitoryDosFormatFromMimeType(String content_type) throws DfException {
 
         content_type = content_type.trim();

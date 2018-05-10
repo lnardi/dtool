@@ -5,6 +5,7 @@
  */
 package br.com.mavalu.useful;
 
+import br.com.mavalu.dtool.DtoolJFrame;
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
@@ -30,6 +31,7 @@ public class LoginTableModel extends AbstractTableModel {
     private int columnSize[] = null;
     private int page = 1;
     private int pageSize = 10;
+    private DtoolJFrame dtool = null;
 
     public List<String> getColumns() {
         return columns;
@@ -52,9 +54,17 @@ public class LoginTableModel extends AbstractTableModel {
         pageSize = pgSize;
     }
 
-    public LoginTableModel(IDfCollection col, int pg, int dtFormat) throws DfException {
-        loadData(col, pg);
+    public LoginTableModel(IDfCollection col, int pg, int dtFormat, DtoolJFrame dtool_l) throws DfException {
         dateFormat = dtFormat;
+        dtool = dtool_l;
+        loadData(col, pg);
+
+    }
+
+    public LoginTableModel(IDfCollection col, int pg, int dtFormat) throws DfException {
+        dateFormat = dtFormat;
+        loadData(col, pg);
+
     }
 
     public LoginTableModel(IDfCollection col, int pg) throws DfException {
@@ -144,7 +154,14 @@ public class LoginTableModel extends AbstractTableModel {
                 }
             }
             rows.add(row);
-
+            //Exibe linhas.
+            if ((rows.size() % 1000) == 0 && dtool != null) {
+                dtool.operationControl(dtool.OP_QUERY_RESULT_SIZE, false, new String[]{Integer.toString(rows.size()) + " - Processing!!! "});
+                if (rows.size() >= 1000001 || dtool.STOP) {
+                    ////Aborta o loop.                    
+                    break;
+                }
+            }
         }
 
         if (pageSize == 0) {
@@ -246,7 +263,7 @@ public class LoginTableModel extends AbstractTableModel {
         dateFormat = format;
     }
 
-    public void executeScriptTemplate(LoginTableModel queryTableModel, String scriptTemplate) throws Exception {
+    public void executeScriptTemplate(LoginTableModel queryTableModel, String scriptTemplate, boolean changeCase) throws Exception {
 
         columns = new <String> ArrayList();
         rows = new <String[]> ArrayList();
@@ -257,6 +274,8 @@ public class LoginTableModel extends AbstractTableModel {
         columnSize[0] = scriptTemplate.length();
 
         String key = "@Value(";
+        String keyLower = "@Lower(";
+        String keyUpper = "@Upper(";
         List<String[]> queryRows = queryTableModel.getRows();
         List<String> queryRowColumns = queryTableModel.getColumns();
         List<String> queryColumns = getColumnList(scriptTemplate);
@@ -266,8 +285,14 @@ public class LoginTableModel extends AbstractTableModel {
         //para cada linha de registro
         for (String[] queryRow : queryRows) {
             query = scriptTemplate;
+            String value = "";
             for (int i = 0; i < columIndex.length; i++) {
-                query = query.replace(key + queryColumns.get(i) + ")", (queryRow[columIndex[i]] == null ? "null" : queryRow[columIndex[i]]));
+                value = queryRow[columIndex[i]] == null ? "null" : queryRow[columIndex[i]];
+                query = query.replace(key + queryColumns.get(i) + ")", (value));
+                if (changeCase) {
+                    query = query.replace(keyUpper + value + ")", value.toUpperCase());
+                    query = query.replace(keyLower + value + ")", value.toLowerCase());
+                }
             }
             rows.add(new String[]{query});
             lenght = query.length();
@@ -397,7 +422,7 @@ public class LoginTableModel extends AbstractTableModel {
         }
         String[] clm = line.split(columnDelimiter);
 
-        System.out.println(clm.length + " == " + clm[0]);
+        //System.out.println(clm.length + " == " + clm[0]);
         ///If yues, line is broken and we have a recursive call
         if (clmTmp != null) {
             String[] clmResult = new String[clmTmp.length + clm.length - 1];
@@ -429,7 +454,8 @@ public class LoginTableModel extends AbstractTableModel {
         //String[] row = new String[ln.length];
         String[] row = new String[columns.size()];
         int columnsList = 0;
-        for (int i = 0; i < ln.length && columnsList < columnSize.length; i++) {
+        int i = 0;
+        for (; i < ln.length && columnsList < columnSize.length; i++) {
 
             String tmp = ln[i];
             if (tmp.startsWith(fieldDelimiter)) {
@@ -437,12 +463,12 @@ public class LoginTableModel extends AbstractTableModel {
                     tmp = tmp + " " + ln[++i];
                     //If the last possition load new line
                     if (i == ln.length - 1) {
-                        ln[i] ="";
+                        ln[i] = "";
                         ln = ReadLine(fileInput, fieldDelimiter, columnDelimiter, ln);
                         i--;//Process again last line.
                     }
                 }
-                
+
                 ln[i] = tmp;
 
             }
@@ -458,6 +484,12 @@ public class LoginTableModel extends AbstractTableModel {
             columnsList++;
         }
 
+        if (i < row.length) {
+            for (; i < row.length; i++) {
+                row[i] = "";
+            }
+
+        }
         return row;
     }
 
@@ -481,10 +513,12 @@ public class LoginTableModel extends AbstractTableModel {
 
         String value = null;
         while ((line = fileInput.readLine()) != null) {
-            //
-            row = new String[1];
-            row[0] = line;
-            rows.add(row);
+            if (!line.equals("GO") && !line.startsWith("--")) {
+                //
+                row = new String[1];
+                row[0] = line;
+                rows.add(row);
+            }
         }
         if (pageSize == 0) {
             pageSize = rows.size();

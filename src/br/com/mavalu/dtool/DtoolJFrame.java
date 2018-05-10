@@ -48,10 +48,11 @@ public class DtoolJFrame extends javax.swing.JFrame {
     public final static int OP_IMPORT_FILE = 10;    
     public final static int OP_IMPORT_SCRIPT = 10; 
     public final static int OP_REFRESH_QUERY_RESULT_TABLE = 11;
+    public static boolean STOP = false;
     
     public int dateFormat = 0;
 
-    private static Logger logger = Logger.getLogger(DtoolJFrame.class.getName());
+    
 
     /**
      * Creates new form dtoolJFrame
@@ -193,18 +194,14 @@ public class DtoolJFrame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            System.out.println(ex);
-            java.util.logging.Logger.getLogger(DtoolJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {            
+            DtoolLogControl.log(ex, Level.SEVERE);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DtoolJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            System.out.println(ex);
-        } catch (IllegalAccessException ex) {
-            System.out.println(ex);
-            java.util.logging.Logger.getLogger(DtoolJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            System.out.println(ex);
-            java.util.logging.Logger.getLogger(DtoolJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            DtoolLogControl.log(ex, Level.SEVERE);            
+        } catch (IllegalAccessException ex) {            
+            DtoolLogControl.log(ex, Level.SEVERE);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {            
+            DtoolLogControl.log(ex, Level.SEVERE);
         }
         //</editor-fold>
         //</editor-fold>
@@ -217,8 +214,7 @@ public class DtoolJFrame extends javax.swing.JFrame {
                             UIManager.getSystemLookAndFeelClassName());
                     new DtoolJFrame();//.setVisible(true);
                 } catch (Exception ex) {
-                    DtoolLogControl.log(ex, Level.SEVERE);
-                    Logger.getLogger(DtoolJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    DtoolLogControl.log(ex, Level.SEVERE);                    
                 }
             }
         });

@@ -20,6 +20,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
 /**
@@ -155,6 +156,7 @@ public class ScriptPanel extends javax.swing.JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
+        jTextArea2.setEditable(false);
         jTextArea2.setColumns(20);
         jTextArea2.setLineWrap(true);
         jTextArea2.setRows(5);
@@ -427,7 +429,7 @@ public class ScriptPanel extends javax.swing.JPanel {
      */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        DtoolLogControl.log("Executando...............................", Level.WARNING);
+        DtoolLogControl.log("======================================EXECUTANDO SCRIPT==================================", Level.WARNING);
         if (!jTextArea2.getText().isEmpty()) {
             if (jTextArea2.getText().toLowerCase().startsWith("delete")
                     || jTextArea2.getText().toLowerCase().startsWith("update")
@@ -460,9 +462,8 @@ public class ScriptPanel extends javax.swing.JPanel {
 
         dtoolJFrame.operationControl(dtoolJFrame.OP_PROGRESS_BAR, true, null);
 
-        jTable1.setModel(new DefaultTableModel());
-        jTable1.repaint();
-
+        //jTable1.setModel(new DefaultTableModel());
+        //jTable1.repaint();
         workerQuery = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
@@ -478,8 +479,7 @@ public class ScriptPanel extends javax.swing.JPanel {
 
                 // Tem que selecionar a linha executada atualmente.
                 // O cancelar, aborta a execução após a última linha executada
-                //  DtoolDqlControl.executeQuery(jTextArea2.getText(), jTable1, (String) jComboBox1.getSelectedItem(),
-                //        (String) jComboBox2.getSelectedItem(), jTextArea2Edited, dtoolJFrame.dateFormat);
+                //DtoolDqlControl.executeScript(jTable1, jTextArea2, jRadioButton1.isSelected());
                 //Exibe o número de linhas retornadas
                 //queryTableModel = (LoginTableModel) jTable1.getModel();
                 //String maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
@@ -505,6 +505,8 @@ public class ScriptPanel extends javax.swing.JPanel {
                 jButton2.setEnabled(true);
                 jButton11.setEnabled(false);
                 jComboBox2.setEnabled(true);
+
+                DtoolLogControl.log("======================================EXECUTANDO SCRIPT==================================", Level.WARNING);
             }
 
         };
@@ -813,15 +815,25 @@ public class ScriptPanel extends javax.swing.JPanel {
              */
             case DtoolJFrame.OP_SCRIPT_SHOW:
                 jTextArea2.setText("");
+
+                JCheckBox cbRemove = new JCheckBox("Remover Quebras (/n/r/t)?");
+                cbRemove.setSelected(true);
+                JCheckBox cbEnableChangeCase = new JCheckBox("Abilitar @Upper/@Lower script");
+                cbEnableChangeCase.setSelected(false);
+                String message = " Configuração";
+                Object[] params = {message, cbRemove, cbEnableChangeCase};
+                int n = JOptionPane.showConfirmDialog(dtoolJFrame, params, "Gerar Script", JOptionPane.CLOSED_OPTION);
+                //boolean dontShow = checkbox.isSelected();
+
                 Object[] objArray = (Object[]) obj;
-                DtoolDqlControl.executeScriptTemplate((LoginTableModel) objArray[0], jTable1, (String) objArray[1], dtoolJFrame.dateFormat, (String) jComboBox2.getSelectedItem());
+                DtoolDqlControl.executeScriptTemplate((LoginTableModel) objArray[0], jTable1, (String) objArray[1], dtoolJFrame.dateFormat, (String) jComboBox2.getSelectedItem(), cbRemove.isSelected(), cbEnableChangeCase.isSelected());
                 queryTableModel = (LoginTableModel) jTable1.getModel();
                 maxRows = Integer.toString(queryTableModel.getMaxRowsCount());
                 dtoolJFrame.operationControl(dtoolJFrame.OP_QUERY_RESULT_SIZE, false, new String[]{maxRows});
                 jLabel2.setText(String.valueOf(queryTableModel.getMaxPageNumber()));
                 jButton10.setEnabled(true);
                 jButton9.setEnabled(true);
-                jButton12.setEnabled(true);                
+                jButton12.setEnabled(true);
                 break;
             case DtoolJFrame.OP_IMPORT_SCRIPT:
                 queryTableModel = (LoginTableModel) obj;
