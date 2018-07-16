@@ -24,26 +24,31 @@ public class GenericTest {
     //String a = "[TAÃ??S CA   R\t\nLA MA\\GA//LH>Ã<as;;;s?Æ?E\"S]";
       
       
-    String[]  temp = "testes.csv".split("\\.");
-    String csvFile_1 =  temp[0] + "._1" + temp[1];
+    //String[]  temp = "testes.csv".split("\\.");
+    //String csvFile_1 =  temp[0] + "._1" + temp[1];
       
       
-    System.out.println(csvFile_1);
-    String a = "CR_XVIII_INTERNATIONAL_BIOHYDROMETALLURGY_SYMPOSIUM_-_IBS_2009_13092009";
+    //System.out.println(csvFile_1);
+    //String a = "CR_XVIII_INTERNATIONAL_BIOHYDROMETALLURGY_SYMPOSIUM_-_IBS_2009_13092009";
 
 //a = "CR_XVIII_INTERNATINAL_BIOHYDROMETALLURGY_SYMPOSIUM_-_IBS_2009_13092009Jimin TR_199906_srb_pet_Estudo_Petrologico_e\n" +
     //           "Geocronologico Yanga,b, 'ªº°°°R!\"uizhi Zhangc, Hong Liua, and \\Sihong Maa.Solid-liquid phase equilibria at " + 
     //         "50 and 75\\ÂC i[]}{,.,<>;:/?*/-+n the NaCl + MgCl2 + H2O çÇóÓôÔõÕéÉê\\/Êâ<>ÂáÁ\"àÀ?ãÃ*íÍ:sy/\\stem and the pitzer model represen-_tati][{}ons.pdf\\";
 
     // System.out.println("String: " + a.replaceAll("[^A-Za-z0-9çÇóÓôÔõÕéÉêÊâÂáÁàÀãÃíÍ.,\\s;\\]\\[\\{\\}\\-_=+\\)\\(&%$#@!\"'\\ª\\º\\°\\\\]", " "));
-    System.out.println("String: " + a.replaceAll("[\\t\\r\\n\\u000B]", "#######"));
+    //System.out.println("String: " + a.replaceAll("[\\t\\r\\n\\u000B]", "#######"));
      
      
    // System.out.println("String: " + a.indexOf("@Lower(")finreplaceAll("[\\t\\r\\n\\u000B]", "#######"));
      
-    int ind1 = a.indexOf("@Lower(");
-    int ind2 = a.indexOf(")", ind1);
+    //int ind1 = a.indexOf("@Lower(");
+    //int ind2 = a.indexOf(")", ind1);
      
+    System.out.println('A' > '0');
+    System.out.println('1' > 'A');
+    System.out.println('A' > 'B');
+    System.out.println('A' > '0');
+    
        
      
     // System.out.println("String: " + a.replaceAll("[\\;\\t\\n\\\\\\/\\:\\*\\?\\\"\\<\\>\\|]", "@"));     

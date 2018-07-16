@@ -69,12 +69,12 @@ public class DocumentumExportControl extends Thread {
                     if (tdc != null && tdc.line != null) {
                         try {
                             String path = null;
+                            //Guarda o ID para Report
+                            exportId = tdc.id;
+                            item = tdc.item;
                             if (mc.exportServerPath()) {
                                 path = documentumUseful.apiExecSize(tdc.id);
                             } else {
-                                //Guarda o ID para Report
-                                exportId = tdc.id;
-                                item = tdc.item;
                                 //exporta o conteúdo da docbase                                
                                 path = documentumUseful.exportDocument(mc.getPath(), mc.getRelativePath(), tdc, mc.getDctmFolderExtruture(), mc.getExpAllInFolderOrLikeServer());
                             }
@@ -237,7 +237,7 @@ public class DocumentumExportControl extends Thread {
     public String getExportId() {
         return exportId;
     }
-    
+
     public int getItem() {
         return item;
     }

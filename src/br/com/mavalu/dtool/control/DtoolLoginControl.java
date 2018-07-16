@@ -147,6 +147,7 @@ public class DtoolLoginControl {
 
         try {
             return DocumentumUseful.getHostName();
+            
         } catch (DfException ex) {
             DtoolLogControl.log("Erro de conexão. Ajuste a conexão e clique no botão \"Relaoad\"", Level.WARNING);
             DtoolLogControl.log(ex, Level.SEVERE);
